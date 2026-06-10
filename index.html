@@ -1,0 +1,2990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIMS – AI-Powered Multi-Agent Inventory Reconciliation & Enterprise Asset Governance</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Syne:wght@600;700;800&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #080c14;
+    --bg2: #0d1420;
+    --bg3: #111827;
+    --surface: rgba(255,255,255,0.04);
+    --surface2: rgba(255,255,255,0.07);
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #e8edf5;
+    --text2: #8b99b5;
+    --text3: #5a6a85;
+    --accent: #3b82f6;
+    --accent2: #6366f1;
+    --accent3: #8b5cf6;
+    --green: #10b981;
+    --yellow: #f59e0b;
+    --red: #ef4444;
+    --cyan: #06b6d4;
+    --pink: #ec4899;
+    --sidebar-w: 260px;
+    --glow: 0 0 40px rgba(59,130,246,0.15);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* SIDEBAR */
+  #sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: var(--sidebar-w);
+    height: 100vh;
+    background: rgba(8,12,20,0.95);
+    backdrop-filter: blur(20px);
+    border-right: 1px solid var(--border);
+    z-index: 100;
+    overflow-y: auto;
+    padding: 24px 0;
+    transition: transform 0.3s ease;
+  }
+
+  #sidebar::-webkit-scrollbar { width: 4px; }
+  #sidebar::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+  .sidebar-logo {
+    padding: 0 20px 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+
+  .sidebar-logo .logo-text {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+  }
+
+  .sidebar-logo .logo-sub {
+    font-size: 10px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-top: 2px;
+  }
+
+  .nav-section {
+    padding: 4px 12px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin: 12px 0 4px;
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 20px;
+    color: var(--text2);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 400;
+    transition: all 0.2s;
+    border-left: 2px solid transparent;
+    cursor: pointer;
+  }
+
+  .nav-link:hover, .nav-link.active {
+    color: var(--text);
+    background: var(--surface);
+    border-left-color: var(--accent);
+  }
+
+  .nav-link .nav-icon { font-size: 14px; opacity: 0.7; width: 16px; text-align: center; }
+
+  /* MAIN */
+  #main {
+    margin-left: var(--sidebar-w);
+    min-height: 100vh;
+  }
+
+  .section {
+    padding: 80px 60px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  .section:nth-child(even) { background: rgba(255,255,255,0.01); }
+
+  /* HERO */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 60px;
+    background: radial-gradient(ellipse 80% 60% at 50% 20%, rgba(59,130,246,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 80% 80%, rgba(139,92,246,0.06) 0%, transparent 50%),
+                var(--bg);
+    position: relative;
+    overflow: hidden;
+  }
+
+  #hero::before {
+    content: '';
+    position: absolute;
+    top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(59,130,246,0.06) 0%, transparent 70%);
+    animation: pulse 6s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.7; }
+  }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(59,130,246,0.1);
+    border: 1px solid rgba(59,130,246,0.25);
+    border-radius: 100px;
+    padding: 6px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+
+  .hero-eyebrow::before { content: '●'; animation: blink 2s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:1}50%{opacity:0.3} }
+
+  .hero-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(42px, 5.5vw, 72px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -2px;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #ffffff 0%, #c7d4f0 60%, #8b99b5 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero-title .accent-word {
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero-subtitle-main {
+    font-size: clamp(16px, 2vw, 21px);
+    color: var(--text2);
+    font-weight: 400;
+    max-width: 600px;
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+
+  .hero-tagline {
+    font-size: 14px;
+    color: var(--accent);
+    font-style: italic;
+    margin-bottom: 48px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    max-width: 900px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 16px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent3));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .stat-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+  .stat-card:hover::before { opacity: 1; }
+
+  .stat-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    font-size: 10px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 500;
+  }
+
+  .stat-delta {
+    font-size: 11px;
+    color: var(--green);
+    margin-top: 4px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* SECTION HEADERS */
+  .sec-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+  }
+
+  .sec-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(28px, 3.5vw, 44px);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -1px;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+
+  .sec-desc {
+    font-size: 15px;
+    color: var(--text2);
+    max-width: 640px;
+    line-height: 1.7;
+    margin-bottom: 48px;
+  }
+
+  /* GLASS CARDS */
+  .glass-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+  }
+
+  .glass-card:hover {
+    border-color: var(--border2);
+    background: var(--surface2);
+    transform: translateY(-2px);
+    box-shadow: var(--glow);
+  }
+
+  .card-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  .card-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .card-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+  .card-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    margin-bottom: 16px;
+  }
+
+  .card-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .card-desc {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+
+  /* TAGS */
+  .tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 500;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .tag-blue { background: rgba(59,130,246,0.12); color: #60a5fa; border: 1px solid rgba(59,130,246,0.2); }
+  .tag-green { background: rgba(16,185,129,0.12); color: #34d399; border: 1px solid rgba(16,185,129,0.2); }
+  .tag-purple { background: rgba(139,92,246,0.12); color: #a78bfa; border: 1px solid rgba(139,92,246,0.2); }
+  .tag-yellow { background: rgba(245,158,11,0.12); color: #fbbf24; border: 1px solid rgba(245,158,11,0.2); }
+  .tag-red { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
+  .tag-cyan { background: rgba(6,182,212,0.12); color: #22d3ee; border: 1px solid rgba(6,182,212,0.2); }
+
+  /* ARCHITECTURE DIAGRAM */
+  .arch-diagram {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px;
+    margin-top: 40px;
+    overflow: hidden;
+  }
+
+  .arch-flow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .arch-layer {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    position: relative;
+    padding: 0 20px;
+  }
+
+  .arch-node {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 20px;
+    text-align: center;
+    min-width: 140px;
+    position: relative;
+    transition: all 0.3s;
+    cursor: default;
+  }
+
+  .arch-node:hover {
+    border-color: var(--accent);
+    background: rgba(59,130,246,0.08);
+    box-shadow: 0 0 20px rgba(59,130,246,0.15);
+  }
+
+  .arch-node-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .arch-node-sub {
+    font-size: 10px;
+    color: var(--text3);
+    margin-top: 2px;
+  }
+
+  .arch-arrow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 40px;
+    color: var(--text3);
+    font-size: 16px;
+    position: relative;
+  }
+
+  .arch-arrow::before {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 20px;
+    left: 50%;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--border2), var(--accent));
+  }
+
+  /* AGENT CARDS */
+  .agent-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.35s ease;
+  }
+
+  .agent-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+
+  .agent-card.a1::before { background: linear-gradient(90deg, #3b82f6, #06b6d4); }
+  .agent-card.a2::before { background: linear-gradient(90deg, #6366f1, #8b5cf6); }
+  .agent-card.a3::before { background: linear-gradient(90deg, #8b5cf6, #ec4899); }
+  .agent-card.a4::before { background: linear-gradient(90deg, #f59e0b, #ef4444); }
+  .agent-card.a5::before { background: linear-gradient(90deg, #10b981, #3b82f6); }
+
+  .agent-card:hover {
+    border-color: var(--border2);
+    transform: translateY(-3px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  }
+
+  .agent-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 20px;
+  }
+
+  .agent-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .agent-desc {
+    font-size: 13px;
+    color: var(--text2);
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+
+  .resp-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .resp-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--text2);
+  }
+
+  .resp-list li::before {
+    content: '→';
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* FLOW STEPS */
+  .flow-container {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    padding-bottom: 12px;
+    margin-top: 40px;
+  }
+
+  .flow-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .flow-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 24px;
+    left: 50%;
+    right: -50%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), rgba(59,130,246,0.2));
+    z-index: 0;
+  }
+
+  .flow-num {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent3));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: white;
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+    box-shadow: 0 0 20px rgba(59,130,246,0.3);
+  }
+
+  .flow-content {
+    text-align: center;
+    padding: 12px 16px 0;
+    min-width: 110px;
+    max-width: 120px;
+  }
+
+  .flow-title { font-size: 11px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .flow-sub { font-size: 10px; color: var(--text3); line-height: 1.4; }
+
+  /* TECH STACK */
+  .tech-category {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 20px;
+  }
+
+  .tech-cat-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tech-cat-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+
+  .tech-cat-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .tech-items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+  }
+
+  .tech-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    transition: all 0.2s;
+  }
+
+  .tech-item:hover { border-color: var(--border2); background: var(--surface2); }
+  .tech-item-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .tech-item-why { font-size: 11px; color: var(--text3); line-height: 1.5; }
+
+  /* DB / ER DIAGRAM */
+  .er-diagram {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px;
+    overflow-x: auto;
+  }
+
+  .er-table {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    min-width: 180px;
+    display: inline-block;
+  }
+
+  .er-table-header {
+    background: rgba(59,130,246,0.15);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .er-col {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 14px;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text2);
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+  }
+
+  .er-col.pk { color: var(--yellow); }
+  .er-col.fk { color: var(--cyan); }
+  .er-col-type { color: var(--text3); font-size: 10px; }
+
+  .er-layout {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    align-items: start;
+  }
+
+  /* FOLDER TREE */
+  .tree-container {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .tree-line {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 3px 0;
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .tree-indent { padding-left: 20px; }
+  .tree-indent2 { padding-left: 40px; }
+
+  .tree-dir { color: var(--accent); font-weight: 600; }
+  .tree-file { color: var(--text2); }
+  .tree-comment { color: var(--text3); font-size: 11px; margin-left: 8px; }
+
+  /* PERMISSION TABLE */
+  .perm-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 32px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .perm-table th {
+    padding: 14px 20px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .perm-table td {
+    padding: 14px 20px;
+    font-size: 13px;
+    color: var(--text2);
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  .perm-table tr:last-child td { border-bottom: none; }
+  .perm-table tr:hover td { background: var(--surface); }
+
+  .perm-check { color: var(--green); font-size: 14px; }
+  .perm-cross { color: var(--text3); font-size: 14px; }
+  .perm-partial { color: var(--yellow); font-size: 14px; }
+
+  /* DEMO CREDENTIALS */
+  .cred-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: 32px;
+  }
+
+  .cred-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+  }
+
+  .cred-role {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+    padding: 4px 12px;
+    border-radius: 100px;
+    display: inline-block;
+  }
+
+  .cred-email {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text2);
+    margin-bottom: 8px;
+    word-break: break-all;
+  }
+
+  .cred-password {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    color: var(--text3);
+    letter-spacing: 3px;
+  }
+
+  .cred-note {
+    font-size: 10px;
+    color: var(--text3);
+    margin-top: 12px;
+    font-style: italic;
+  }
+
+  /* WAR ROOM */
+  .warroom-chat {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    max-height: 480px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .chat-msg {
+    display: flex;
+    gap: 12px;
+    animation: fadeInUp 0.4s ease;
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .chat-avatar {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    flex-shrink: 0;
+    font-weight: 700;
+    font-family: 'Syne', sans-serif;
+  }
+
+  .chat-body { flex: 1; }
+  .chat-agent { font-size: 11px; font-weight: 700; margin-bottom: 4px; }
+  .chat-text {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.6;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* COMPARISON */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 40px;
+  }
+
+  .compare-col {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .compare-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .compare-header-text { font-weight: 700; font-size: 16px; }
+  .compare-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 10px; }
+
+  .compare-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--text2);
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: var(--surface);
+  }
+
+  /* ROADMAP */
+  .roadmap {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin-top: 40px;
+    position: relative;
+  }
+
+  .roadmap::before {
+    content: '';
+    position: absolute;
+    top: 38px;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent3));
+  }
+
+  .phase-card {
+    text-align: center;
+    padding: 0 16px;
+    position: relative;
+  }
+
+  .phase-num {
+    width: 76px; height: 76px;
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+    background: var(--bg);
+    border: 2px solid var(--border2);
+  }
+
+  .phase-num.active {
+    border-color: var(--accent);
+    background: rgba(59,130,246,0.1);
+    box-shadow: 0 0 24px rgba(59,130,246,0.25);
+  }
+
+  .phase-p { font-size: 10px; color: var(--text3); font-weight: 600; text-transform: uppercase; }
+  .phase-n { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: var(--text); }
+  .phase-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+  .phase-desc { font-size: 12px; color: var(--text3); line-height: 1.6; }
+  .phase-items { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+  .phase-item { font-size: 11px; color: var(--text2); display: flex; align-items: center; gap: 6px; justify-content: center; }
+
+  /* SCORE BARS */
+  .score-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .score-label { font-size: 13px; color: var(--text2); min-width: 150px; }
+  .score-bar-track {
+    flex: 1;
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .score-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 1s ease;
+  }
+
+  .score-val { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text); min-width: 36px; text-align: right; }
+
+  /* FORMULA */
+  .formula-box {
+    background: rgba(59,130,246,0.06);
+    border: 1px solid rgba(59,130,246,0.2);
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--text2);
+    margin: 12px 0;
+    line-height: 1.8;
+  }
+
+  /* FOOTER */
+  #footer {
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    padding: 40px 60px;
+    text-align: center;
+  }
+
+  .footer-logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+
+  .footer-tagline { font-size: 13px; color: var(--text3); margin-bottom: 6px; }
+  .footer-built { font-size: 12px; color: var(--text3); font-family: 'JetBrains Mono', monospace; }
+
+  /* MOBILE TOGGLE */
+  #sidebar-toggle {
+    display: none;
+    position: fixed;
+    top: 16px; left: 16px;
+    z-index: 200;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    color: var(--text);
+    font-size: 18px;
+  }
+
+  /* GOVERNANCE SCORE RING */
+  .score-ring-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 48px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+  }
+
+  .score-ring {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .score-ring svg { transform: rotate(-90deg); }
+
+  .score-ring-label {
+    font-size: 12px;
+    color: var(--text2);
+    font-weight: 500;
+    text-align: center;
+    max-width: 100px;
+  }
+
+  /* DASHBOARD MODULES */
+  .module-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-top: 32px;
+  }
+
+  .module-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.25s;
+    cursor: default;
+  }
+
+  .module-card:hover {
+    border-color: var(--accent);
+    background: rgba(59,130,246,0.05);
+    transform: translateY(-2px);
+  }
+
+  .module-icon { font-size: 24px; margin-bottom: 10px; }
+  .module-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .module-desc { font-size: 11px; color: var(--text3); line-height: 1.5; }
+
+  /* BENEFIT CARDS */
+  .benefit-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-top: 32px;
+  }
+
+  .benefit-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    transition: all 0.25s;
+  }
+
+  .benefit-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+  .benefit-icon { font-size: 28px; flex-shrink: 0; margin-top: 2px; }
+  .benefit-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .benefit-desc { font-size: 12px; color: var(--text2); line-height: 1.6; }
+  .benefit-stat { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--green); margin-top: 8px; }
+
+  /* RECONCILIATION TYPES */
+  .recon-types {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 32px;
+  }
+
+  .recon-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    transition: all 0.25s;
+  }
+
+  .recon-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+  .recon-type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 12px;
+  }
+
+  .recon-card-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+  .recon-card-desc { font-size: 12px; color: var(--text2); line-height: 1.6; margin-bottom: 14px; }
+
+  .recon-example {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text3);
+    line-height: 1.6;
+  }
+
+  /* SUMMARY SECTION */
+  #summary {
+    background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(59,130,246,0.06), transparent 60%);
+    text-align: center;
+    padding: 80px 60px;
+  }
+
+  .summary-features {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin: 32px 0;
+  }
+
+  .summary-feature {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 8px 20px;
+    font-size: 13px;
+    color: var(--text2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+  /* RESPONSIVE */
+  @media (max-width: 1100px) {
+    :root { --sidebar-w: 220px; }
+    .card-grid-4 { grid-template-columns: repeat(2,1fr); }
+    .stats-grid { grid-template-columns: repeat(3,1fr); }
+    .er-layout { grid-template-columns: repeat(2,1fr); }
+    .cred-grid { grid-template-columns: repeat(2,1fr); }
+    .module-grid { grid-template-columns: repeat(2,1fr); }
+    .roadmap { grid-template-columns: repeat(2,1fr); }
+    .roadmap::before { display: none; }
+  }
+
+  @media (max-width: 768px) {
+    #sidebar { transform: translateX(-100%); }
+    #sidebar.open { transform: translateX(0); }
+    #sidebar-toggle { display: block; }
+    #main { margin-left: 0; }
+    .section { padding: 60px 24px; }
+    #hero { padding: 80px 24px 60px; }
+    .stats-grid { grid-template-columns: repeat(2,1fr); }
+    .card-grid-2, .card-grid-3 { grid-template-columns: 1fr; }
+    .compare-grid { grid-template-columns: 1fr; }
+    .recon-types { grid-template-columns: 1fr; }
+    .cred-grid { grid-template-columns: 1fr; }
+    .module-grid { grid-template-columns: repeat(2,1fr); }
+  }
+
+  /* Animations */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .fade-up.visible { opacity: 1; transform: translateY(0); }
+  .fade-up-d1 { transition-delay: 0.1s; }
+  .fade-up-d2 { transition-delay: 0.2s; }
+  .fade-up-d3 { transition-delay: 0.3s; }
+  .fade-up-d4 { transition-delay: 0.4s; }
+</style>
+</head>
+<body>
+
+<button id="sidebar-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-text">AIMS</div>
+    <div class="logo-sub">Enterprise Asset Governance</div>
+  </div>
+
+  <div class="nav-section">Overview</div>
+  <a class="nav-link active" href="#hero"><span class="nav-icon">🏠</span>Home</a>
+  <a class="nav-link" href="#overview"><span class="nav-icon">📋</span>Project Overview</a>
+  <a class="nav-link" href="#challenges"><span class="nav-icon">⚡</span>Business Challenge</a>
+
+  <div class="nav-section">Architecture</div>
+  <a class="nav-link" href="#architecture"><span class="nav-icon">🏗️</span>System Architecture</a>
+  <a class="nav-link" href="#agents"><span class="nav-icon">🤖</span>AI Agents</a>
+  <a class="nav-link" href="#dataflow"><span class="nav-icon">🔄</span>Data Flow</a>
+  <a class="nav-link" href="#warroom"><span class="nav-icon">🎯</span>AI War Room</a>
+
+  <div class="nav-section">Platform</div>
+  <a class="nav-link" href="#features"><span class="nav-icon">✨</span>Core Features</a>
+  <a class="nav-link" href="#reconciliation"><span class="nav-icon">🔍</span>Reconciliation Engine</a>
+  <a class="nav-link" href="#governance"><span class="nav-icon">🛡️</span>Governance Engine</a>
+  <a class="nav-link" href="#dashboard"><span class="nav-icon">📊</span>Dashboard Modules</a>
+
+  <div class="nav-section">Technical</div>
+  <a class="nav-link" href="#techstack"><span class="nav-icon">⚙️</span>Tech Stack</a>
+  <a class="nav-link" href="#database"><span class="nav-icon">🗄️</span>Database Design</a>
+  <a class="nav-link" href="#structure"><span class="nav-icon">📁</span>Folder Structure</a>
+  <a class="nav-link" href="#rbac"><span class="nav-icon">🔐</span>Access Control</a>
+  <a class="nav-link" href="#auth"><span class="nav-icon">🔑</span>Authentication</a>
+
+  <div class="nav-section">Value</div>
+  <a class="nav-link" href="#benefits"><span class="nav-icon">💎</span>Benefits</a>
+  <a class="nav-link" href="#comparison"><span class="nav-icon">⚖️</span>Why AIMS</a>
+  <a class="nav-link" href="#roadmap"><span class="nav-icon">🗺️</span>Roadmap</a>
+  <a class="nav-link" href="#summary"><span class="nav-icon">🎉</span>Summary</a>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main id="main">
+
+  <!-- HERO -->
+  <section id="hero" class="section" style="border-bottom:1px solid var(--border)">
+    <div class="hero-eyebrow">Multi-Agent AI Platform · Enterprise Grade</div>
+    <h1 class="hero-title">
+      <span class="accent-word">AIMS</span><br>
+      AI-Powered Multi-Agent<br>Inventory Reconciliation &<br>Enterprise Asset Governance
+    </h1>
+    <p class="hero-subtitle-main">
+      A unified platform that combines autonomous AI agents, CMDB intelligence, and enterprise governance into a single operational system.
+    </p>
+    <p class="hero-tagline">// Transforming CMDB Reconciliation into Autonomous Governance Intelligence</p>
+
+    <div class="stats-grid fade-up">
+      <div class="stat-card">
+        <div class="stat-value" style="color:#10b981">94.7</div>
+        <div class="stat-label">Governance Score</div>
+        <div class="stat-delta">↑ +12.3 pts</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" style="color:#3b82f6">98.2%</div>
+        <div class="stat-label">Inventory Health</div>
+        <div class="stat-delta">↑ +6.1%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" style="color:#8b5cf6">99.1%</div>
+        <div class="stat-label">Compliance Ready</div>
+        <div class="stat-delta">↑ +18.4%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" style="color:#f59e0b">5</div>
+        <div class="stat-label">AI Agents Active</div>
+        <div class="stat-delta">⬤ All Online</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" style="color:#06b6d4">∞</div>
+        <div class="stat-label">Executive Reports</div>
+        <div class="stat-delta">Auto-Generated</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OVERVIEW -->
+  <section id="overview" class="section">
+    <div class="sec-eyebrow">Project Overview</div>
+    <h2 class="sec-title">What is AIMS?</h2>
+    <p class="sec-desc">AIMS is an enterprise-grade, AI-first platform that autonomously reconciles discovered infrastructure assets against CMDB records, identifies governance anomalies, assesses compliance risk, and delivers executive-level intelligence — all orchestrated through five specialized AI agents.</p>
+
+    <div class="card-grid-2">
+      <div class="glass-card fade-up">
+        <div class="card-icon" style="background:rgba(59,130,246,0.12)">📌</div>
+        <div class="card-title">The Core Problem</div>
+        <div class="card-desc">Enterprise IT environments drift continuously. Assets are provisioned without CMDB registration, configuration changes go untracked, and naming conventions erode over time. Reconciliation is manual, periodic, and error-prone — creating dangerous blind spots that surface only during audits.</div>
+        <br>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+          <span class="tag tag-red">CMDB Drift</span>
+          <span class="tag tag-red">Rogue Assets</span>
+          <span class="tag tag-red">Audit Failures</span>
+          <span class="tag tag-red">Compliance Gaps</span>
+        </div>
+      </div>
+      <div class="glass-card fade-up fade-up-d1">
+        <div class="card-icon" style="background:rgba(16,185,129,0.12)">✅</div>
+        <div class="card-title">The AIMS Solution</div>
+        <div class="card-desc">AIMS deploys a coordinated swarm of five autonomous AI agents that ingest live infrastructure inventory, compare it against CMDB expected state, classify every discrepancy with Gemini-powered root cause analysis, generate remediation plans, and synthesize everything into governance scores and executive PDF reports — continuously and automatically.</div>
+        <br>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+          <span class="tag tag-green">Autonomous</span>
+          <span class="tag tag-green">Continuous</span>
+          <span class="tag tag-green">AI-Driven</span>
+          <span class="tag tag-green">Executive-Ready</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-grid-3" style="margin-top:20px">
+      <div class="glass-card fade-up">
+        <div class="card-icon" style="background:rgba(139,92,246,0.12)">🏢</div>
+        <div class="card-title">Who It's Built For</div>
+        <div class="card-desc">Large enterprises running ServiceNow CMDB alongside hybrid cloud, on-premise data centers, and multi-tenant SaaS environments. IT operations teams, compliance officers, and C-suite executives who need asset truth at scale.</div>
+      </div>
+      <div class="glass-card fade-up fade-up-d1">
+        <div class="card-icon" style="background:rgba(245,158,11,0.12)">⚡</div>
+        <div class="card-title">How It Works</div>
+        <div class="card-desc">Upload your current infrastructure inventory (CSV/JSON) alongside ServiceNow CMDB exports. AIMS orchestrates all five agents sequentially, producing a full reconciliation report, AI analysis, governance scores, and downloadable executive PDF within minutes.</div>
+      </div>
+      <div class="glass-card fade-up fade-up-d2">
+        <div class="card-icon" style="background:rgba(6,182,212,0.12)">🎯</div>
+        <div class="card-title">The Governance Promise</div>
+        <div class="card-desc">Every reconciliation cycle produces a quantified Governance Score (0–100), Inventory Health Score, Compliance Readiness Rating, and Trust Score — giving leadership an unambiguous measure of their IT estate's integrity.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BUSINESS CHALLENGE -->
+  <section id="challenges" class="section">
+    <div class="sec-eyebrow">Business Challenge</div>
+    <h2 class="sec-title">Why Enterprises Fail at Asset Governance</h2>
+    <p class="sec-desc">Five systemic failures create cascading risk across IT, compliance, and finance functions. AIMS was designed to address each one directly.</p>
+
+    <div class="card-grid-3" style="margin-top:8px">
+      <div class="glass-card fade-up" style="border-left:3px solid var(--red)">
+        <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:16px">
+          <div class="card-icon" style="background:rgba(239,68,68,0.12);margin-bottom:0">🔍</div>
+          <span class="tag tag-red">HIGH RISK</span>
+        </div>
+        <div class="card-title">Missing Assets</div>
+        <div class="card-desc">Assets that exist in the CMDB as expected — servers, VMs, network devices — but have gone offline, been decommissioned, or simply disappeared without formal change management. During audits, these create unexplainable gaps.</div>
+        <div style="margin-top:16px;padding:10px;background:var(--surface);border-radius:8px">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px">→ Impact</div>
+          <div style="font-size:12px;color:var(--text2)">SOC 2 audit findings, SLA breaches, security blind spots</div>
+        </div>
+        <div style="margin-top:8px;padding:10px;background:var(--surface);border-radius:8px">
+          <div style="font-size:11px;color:var(--green);margin-bottom:4px">→ AIMS Response</div>
+          <div style="font-size:12px;color:var(--text2)">Flags every CMDB-expected asset with no discovered counterpart. Auto-creates incident tickets via ServiceNow integration.</div>
+        </div>
+      </div>
+
+      <div class="glass-card fade-up fade-up-d1" style="border-left:3px solid var(--yellow)">
+        <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:16px">
+          <div class="card-icon" style="background:rgba(245,158,11,0.12);margin-bottom:0">👻</div>
+          <span class="tag tag-yellow">MEDIUM RISK</span>
+        </div>
+        <div class="card-title">Untracked (Rogue) Assets</div>
+        <div class="card-desc">Assets discovered on the live network that have no corresponding CMDB record. These are often shadow IT deployments, unauthorized cloud VMs, or legacy systems that were never formally registered.</div>
+        <div style="margin-top:16px;padding:10px;background:var(--surface);border-radius:8px">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px">→ Impact</div>
+          <div style="font-size:12px;color:var(--text2)">Unpatched attack surface, license violations, capacity miscalculations</div>
+        </div>
+        <div style="margin-top:8px;padding:10px;background:var(--surface);border-radius:8px">
+          <div style="font-size:11px;color:var(--green);margin-bottom:4px">→ AIMS Response</div>
+          <div style="font-size:12px;color:var(--text2)">Discovery agent surface all unregistered assets with AI-generated CMDB entry recommendations.</div>
+        </div>
+      </div>
+
+      <div class="glass-card fade-up fade-up-d2" style="border-left:3px solid var(--accent)">
+        <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:16px">
+          <div class="card-icon" style="background:rgba(59,130,246,0.12);margin-bottom:0">⚙️</div>
+          <span class="tag tag-blue">MEDIUM RISK</span>
+        </div>
+        <div class="card-title">Configuration Drift</div>
+        <div class="card-desc">Assets that match by identity but whose actual configuration (OS version, RAM, CPU, software) no longer matches the CMDB record. The most common and hardest-to-detect form of data quality failure.</div>
+        <div style="margin-top:16px;padding:10px;background:var(--surface);border-radius:8px">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px">→ Impact</div>
+          <div style="font-size:12px;color:var(--text2)">Change management failures, patch gaps, capacity planning errors</div>
+        </div>
+        <div style="margin-top:8px;padding:10px;background:var(--surface);border-radius:8px">
+          <div style="font-size:11px;color:var(--green);margin-bottom:4px">→ AIMS Response</div>
+          <div style="font-size:12px;color:var(--text2)">Attribute-by-attribute comparison with confidence scoring and AI-generated update scripts.</div>
+        </div>
+      </div>
+
+      <div class="glass-card fade-up" style="border-left:3px solid var(--accent3)">
+        <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:16px">
+          <div class="card-icon" style="background:rgba(139,92,246,0.12);margin-bottom:0">🏷️</div>
+          <span class="tag tag-purple">LOW RISK</span>
+        </div>
+        <div class="card-title">Naming Convention Drift</div>
+        <div class="card-desc">Assets with hostnames, identifiers, or labels that deviate from the enterprise naming standard. While seemingly minor, naming inconsistencies break automation toolchains, monitoring dashboards, and cross-system integrations.</div>
+        <div style="margin-top:16px;padding:10px;background:var(--surface);border-radius:8px">
+          <div style="font-size:11px;color:var(--green);margin-bottom:4px">→ AIMS Response</div>
+          <div style="font-size:12px;color:var(--text2)">Fuzzy-match detection using RapidFuzz with similarity scoring. Rename recommendations generated automatically.</div>
+        </div>
+      </div>
+
+      <div class="glass-card fade-up fade-up-d1" style="border-left:3px solid var(--cyan)">
+        <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:16px">
+          <div class="card-icon" style="background:rgba(6,182,212,0.12);margin-bottom:0">📋</div>
+          <span class="tag tag-cyan">COMPLIANCE</span>
+        </div>
+        <div class="card-title">Compliance & Audit Failures</div>
+        <div class="card-desc">Regulatory frameworks (SOC 2, ISO 27001, GDPR, HIPAA, PCI-DSS) require documented, accurate asset inventories. Manual reconciliation cycles are too slow and too infrequent to maintain continuous compliance posture.</div>
+        <div style="margin-top:16px;padding:10px;background:var(--surface);border-radius:8px">
+          <div style="font-size:11px;color:var(--green);margin-bottom:4px">→ AIMS Response</div>
+          <div style="font-size:12px;color:var(--text2)">Continuous compliance scoring with per-framework mapping and audit-ready PDF evidence packages.</div>
+        </div>
+      </div>
+
+      <div class="glass-card fade-up fade-up-d2" style="border-left:3px solid var(--pink)">
+        <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:16px">
+          <div class="card-icon" style="background:rgba(236,72,153,0.12);margin-bottom:0">🔁</div>
+          <span class="tag" style="background:rgba(236,72,153,0.12);color:#f472b6;border:1px solid rgba(236,72,153,0.2)">OPERATIONAL</span>
+        </div>
+        <div class="card-title">Operational Inefficiency</div>
+        <div class="card-desc">Traditional reconciliation requires a team of analysts, days of manual comparison work, and specialist knowledge of CMDB schemas. With estates of 50,000+ assets, this is economically unsustainable and cognitively error-prone.</div>
+        <div style="margin-top:16px;padding:10px;background:var(--surface);border-radius:8px">
+          <div style="font-size:11px;color:var(--green);margin-bottom:4px">→ AIMS Response</div>
+          <div style="font-size:12px;color:var(--text2)">Full reconciliation cycle completed autonomously in minutes, not days. Zero manual comparison required.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ARCHITECTURE -->
+  <section id="architecture" class="section">
+    <div class="sec-eyebrow">System Architecture</div>
+    <h2 class="sec-title">Complete System Architecture</h2>
+    <p class="sec-desc">AIMS follows a layered, event-driven architecture where each layer has a single responsibility. Data flows deterministically from ingestion through analysis to governance output.</p>
+
+    <div class="arch-diagram fade-up">
+      <div style="text-align:center;margin-bottom:32px">
+        <div style="font-size:11px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">Full Platform Data Flow</div>
+        <div style="width:60px;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent3));margin:0 auto"></div>
+      </div>
+
+      <!-- Row 1: Data Sources -->
+      <div style="display:flex;justify-content:center;gap:16px;margin-bottom:0">
+        <div style="text-align:center;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;width:100%">Data Sources</div>
+      </div>
+      <div class="arch-layer" style="margin-bottom:12px">
+        <div class="arch-node" style="border-color:rgba(59,130,246,0.4)">
+          <div style="font-size:18px;margin-bottom:4px">🗂️</div>
+          <div class="arch-node-title">ServiceNow CMDB</div>
+          <div class="arch-node-sub">Expected Inventory</div>
+        </div>
+        <div class="arch-node" style="border-color:rgba(59,130,246,0.4)">
+          <div style="font-size:18px;margin-bottom:4px">📄</div>
+          <div class="arch-node-title">CSV / JSON Upload</div>
+          <div class="arch-node-sub">Live Infrastructure Scan</div>
+        </div>
+        <div class="arch-node" style="border-color:rgba(59,130,246,0.4)">
+          <div style="font-size:18px;margin-bottom:4px">☁️</div>
+          <div class="arch-node-title">Cloud Discovery</div>
+          <div class="arch-node-sub">AWS / Azure / GCP</div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:center;align-items:center;height:36px;position:relative">
+        <div style="width:1px;height:100%;background:linear-gradient(to bottom,var(--border2),var(--accent));position:absolute"></div>
+        <div style="color:var(--accent);font-size:14px;position:relative;z-index:1;background:var(--bg2);padding:0 4px">▼</div>
+      </div>
+
+      <!-- Row 2: API Gateway -->
+      <div class="arch-layer" style="margin-bottom:0">
+        <div class="arch-node" style="border-color:rgba(99,102,241,0.4);min-width:300px;background:rgba(99,102,241,0.05)">
+          <div style="font-size:18px;margin-bottom:4px">⚡</div>
+          <div class="arch-node-title">FastAPI Gateway</div>
+          <div class="arch-node-sub">REST API · Auth · Rate Limiting · WebSockets</div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:center;align-items:center;height:36px;position:relative">
+        <div style="width:1px;height:100%;background:linear-gradient(to bottom,var(--border2),var(--accent3));position:absolute"></div>
+        <div style="color:var(--accent3);font-size:14px;position:relative;z-index:1;background:var(--bg2);padding:0 4px">▼</div>
+      </div>
+
+      <!-- Row 3: AI Agents -->
+      <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;text-align:center;margin-bottom:10px">Multi-Agent Orchestration Layer</div>
+      <div class="arch-layer" style="gap:8px;margin-bottom:0">
+        <div class="arch-node" style="border-color:rgba(59,130,246,0.4);background:rgba(59,130,246,0.05);min-width:120px">
+          <div style="font-size:14px;margin-bottom:4px">📥</div>
+          <div class="arch-node-title" style="font-size:11px">Inventory Agent</div>
+        </div>
+        <div style="display:flex;align-items:center;color:var(--accent);font-size:12px">→</div>
+        <div class="arch-node" style="border-color:rgba(99,102,241,0.4);background:rgba(99,102,241,0.05);min-width:120px">
+          <div style="font-size:14px;margin-bottom:4px">🔄</div>
+          <div class="arch-node-title" style="font-size:11px">Reconciliation Agent</div>
+        </div>
+        <div style="display:flex;align-items:center;color:var(--accent);font-size:12px">→</div>
+        <div class="arch-node" style="border-color:rgba(139,92,246,0.4);background:rgba(139,92,246,0.05);min-width:120px">
+          <div style="font-size:14px;margin-bottom:4px">🧠</div>
+          <div class="arch-node-title" style="font-size:11px">Analysis Agent</div>
+          <div class="arch-node-sub" style="color:var(--accent3)">Gemini 1.5</div>
+        </div>
+        <div style="display:flex;align-items:center;color:var(--accent);font-size:12px">→</div>
+        <div class="arch-node" style="border-color:rgba(245,158,11,0.4);background:rgba(245,158,11,0.05);min-width:120px">
+          <div style="font-size:14px;margin-bottom:4px">💡</div>
+          <div class="arch-node-title" style="font-size:11px">Recommendation Agent</div>
+        </div>
+        <div style="display:flex;align-items:center;color:var(--accent);font-size:12px">→</div>
+        <div class="arch-node" style="border-color:rgba(16,185,129,0.4);background:rgba(16,185,129,0.05);min-width:120px">
+          <div style="font-size:14px;margin-bottom:4px">📊</div>
+          <div class="arch-node-title" style="font-size:11px">Executive Agent</div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:center;align-items:center;height:36px;position:relative">
+        <div style="width:1px;height:100%;background:linear-gradient(to bottom,var(--border2),var(--green));position:absolute"></div>
+        <div style="color:var(--green);font-size:14px;position:relative;z-index:1;background:var(--bg2);padding:0 4px">▼</div>
+      </div>
+
+      <!-- Row 4: Data Layer -->
+      <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;text-align:center;margin-bottom:10px">Data Persistence Layer</div>
+      <div class="arch-layer" style="gap:12px;margin-bottom:0">
+        <div class="arch-node" style="border-color:rgba(16,185,129,0.3);background:rgba(16,185,129,0.04)">
+          <div style="font-size:14px;margin-bottom:4px">🐘</div>
+          <div class="arch-node-title" style="font-size:11px">PostgreSQL</div>
+          <div class="arch-node-sub">Primary Store</div>
+        </div>
+        <div class="arch-node" style="border-color:rgba(239,68,68,0.3);background:rgba(239,68,68,0.04)">
+          <div style="font-size:14px;margin-bottom:4px">⚡</div>
+          <div class="arch-node-title" style="font-size:11px">Redis</div>
+          <div class="arch-node-sub">Cache · Queue</div>
+        </div>
+        <div class="arch-node" style="border-color:rgba(245,158,11,0.3);background:rgba(245,158,11,0.04)">
+          <div style="font-size:14px;margin-bottom:4px">🗃️</div>
+          <div class="arch-node-title" style="font-size:11px">SQLite</div>
+          <div class="arch-node-sub">Dev / Test</div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:center;align-items:center;height:36px;position:relative">
+        <div style="width:1px;height:100%;background:linear-gradient(to bottom,var(--border2),var(--cyan));position:absolute"></div>
+        <div style="color:var(--cyan);font-size:14px;position:relative;z-index:1;background:var(--bg2);padding:0 4px">▼</div>
+      </div>
+
+      <!-- Row 5: Output -->
+      <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;text-align:center;margin-bottom:10px">Output Layer</div>
+      <div class="arch-layer" style="gap:12px">
+        <div class="arch-node" style="border-color:rgba(6,182,212,0.4);background:rgba(6,182,212,0.05)">
+          <div style="font-size:14px;margin-bottom:4px">🖥️</div>
+          <div class="arch-node-title" style="font-size:11px">Governance Dashboard</div>
+        </div>
+        <div class="arch-node" style="border-color:rgba(6,182,212,0.4);background:rgba(6,182,212,0.05)">
+          <div style="font-size:14px;margin-bottom:4px">📄</div>
+          <div class="arch-node-title" style="font-size:11px">PDF Reports</div>
+        </div>
+        <div class="arch-node" style="border-color:rgba(6,182,212,0.4);background:rgba(6,182,212,0.05)">
+          <div style="font-size:14px;margin-bottom:4px">🤖</div>
+          <div class="arch-node-title" style="font-size:11px">AI Chatbot</div>
+        </div>
+        <div class="arch-node" style="border-color:rgba(6,182,212,0.4);background:rgba(6,182,212,0.05)">
+          <div style="font-size:14px;margin-bottom:4px">📊</div>
+          <div class="arch-node-title" style="font-size:11px">Prometheus / Grafana</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI AGENTS -->
+  <section id="agents" class="section">
+    <div class="sec-eyebrow">Multi-Agent Architecture</div>
+    <h2 class="sec-title">Five Specialized AI Agents</h2>
+    <p class="sec-desc">Each agent owns a discrete domain of the reconciliation pipeline. Agents communicate through a shared context object managed by the LangGraph-style orchestrator, passing enriched state downstream at each stage.</p>
+
+    <div style="display:flex;flex-direction:column;gap:20px;margin-top:8px">
+
+      <!-- Agent 1 -->
+      <div class="agent-card a1 fade-up">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
+          <div>
+            <div class="agent-badge" style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.25);color:#60a5fa">
+              <span>01</span> INGESTION LAYER
+            </div>
+            <h3 class="agent-title">Inventory Ingestion Agent</h3>
+            <p class="agent-desc">The entry point for all infrastructure data. This agent handles the complexity of diverse data formats from multiple sources, normalizing everything into a canonical AssetRecord schema before passing to the reconciliation pipeline. It is the data quality guardian of the entire system.</p>
+            <ul class="resp-list">
+              <li>Parse CSV files from network scanners (Nmap, Qualys, Tenable) and CMDB exports</li>
+              <li>Parse JSON payloads from cloud APIs (AWS Config, Azure Resource Graph, GCP Asset Inventory)</li>
+              <li>Normalize asset attributes to canonical schema — hostname, IP, MAC, OS, owner, environment</li>
+              <li>Validate data completeness, flag malformed records, and compute initial data quality score</li>
+              <li>Deduplicate assets by composite key (hostname + IP + MAC) with configurable precedence rules</li>
+            </ul>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px">Input / Output Contract</div>
+            <div class="formula-box">
+<span style="color:var(--cyan)">INPUT:</span>  raw_csv_path: str
+         raw_json_path: str
+         cmdb_export_path: str
+
+<span style="color:var(--green)">OUTPUT:</span> normalized_assets: List[AssetRecord]
+         data_quality_score: float
+         rejected_records: List[str]
+         ingestion_metadata: dict
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">
+              <span class="tag tag-blue">CSV Parser</span>
+              <span class="tag tag-blue">JSON Parser</span>
+              <span class="tag tag-blue">Pydantic Validation</span>
+              <span class="tag tag-blue">RapidFuzz Dedup</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agent 2 -->
+      <div class="agent-card a2 fade-up">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
+          <div>
+            <div class="agent-badge" style="background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.25);color:#a5b4fc">
+              <span>02</span> RECONCILIATION LAYER
+            </div>
+            <h3 class="agent-title">Reconciliation Agent</h3>
+            <p class="agent-desc">The analytical core of AIMS. This agent performs exhaustive asset matching between the discovered inventory and the expected CMDB state, classifying every asset into one of six reconciliation outcomes using a multi-pass comparison algorithm.</p>
+            <ul class="resp-list">
+              <li>Exact match: hostname, IP, MAC, and all attributes align — asset confirmed healthy</li>
+              <li>Missing asset detection: expected CMDB asset has no discovered counterpart</li>
+              <li>Untracked asset detection: discovered asset has no CMDB record — potential rogue</li>
+              <li>Naming drift detection: fuzzy hostname matching (RapidFuzz ≥85% similarity threshold)</li>
+              <li>Configuration drift: attribute-level diff — OS, RAM, CPU, software versions, tags</li>
+              <li>Duplicate detection: multiple assets resolving to same identity with conflicting data</li>
+            </ul>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px">Matching Algorithm</div>
+            <div class="formula-box">
+<span style="color:var(--cyan)">PASS 1:</span> Exact match by (hostname ∧ IP ∧ MAC)
+<span style="color:var(--cyan)">PASS 2:</span> Fuzzy match hostname
+         similarity = RapidFuzz.ratio(h1, h2)
+         threshold = 0.85
+<span style="color:var(--cyan)">PASS 3:</span> IP-only match (hostname changed)
+<span style="color:var(--cyan)">PASS 4:</span> MAC-only match (IP reassigned)
+<span style="color:var(--yellow)">UNMATCHED →</span> Missing | Untracked
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">
+              <span class="tag tag-purple">RapidFuzz</span>
+              <span class="tag tag-purple">Multi-Pass</span>
+              <span class="tag tag-purple">Attribute Diff</span>
+              <span class="tag tag-purple">Confidence Score</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agent 3 -->
+      <div class="agent-card a3 fade-up">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
+          <div>
+            <div class="agent-badge" style="background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.25);color:#c4b5fd">
+              <span>03</span> AI ANALYSIS LAYER
+            </div>
+            <h3 class="agent-title">AI Analysis Agent</h3>
+            <p class="agent-desc">The intelligence layer. This agent consumes the raw reconciliation results and calls Gemini 1.5 Flash to perform contextual root cause analysis, business impact assessment, and governance evaluation that no rule-based system could produce.</p>
+            <ul class="resp-list">
+              <li>Root cause analysis: WHY did this discrepancy occur? (unauthorized change, decommission without CMDB update, migration, etc.)</li>
+              <li>Business impact analysis: What is the financial, operational, and compliance risk of this asset discrepancy?</li>
+              <li>Confidence scoring: Assigns 0–100 confidence to each reconciliation finding based on context</li>
+              <li>Governance assessment: Maps each issue to CIS Controls, NIST CSF, SOC 2, ISO 27001 frameworks</li>
+              <li>Predictive drift: Identifies assets trending toward non-compliance based on historical patterns</li>
+            </ul>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px">Gemini Integration</div>
+            <div class="formula-box">
+<span style="color:var(--pink)">MODEL:</span>   gemini-1.5-flash-latest
+<span style="color:var(--pink)">METHOD:</span>  Structured prompt engineering
+          + asset diff context injection
+          + enterprise knowledge base
+
+<span style="color:var(--pink)">OUTPUT:</span>  root_cause: str
+          business_impact: str
+          confidence: float [0–1]
+          frameworks_affected: list
+          remediation_priority: int
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">
+              <span class="tag" style="background:rgba(236,72,153,0.1);color:#f472b6;border:1px solid rgba(236,72,153,0.2)">Gemini 1.5 Flash</span>
+              <span class="tag tag-purple">Root Cause AI</span>
+              <span class="tag tag-purple">Impact Analysis</span>
+              <span class="tag tag-purple">MCP Protocol</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agent 4 -->
+      <div class="agent-card a4 fade-up">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
+          <div>
+            <div class="agent-badge" style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);color:#fbbf24">
+              <span>04</span> REMEDIATION LAYER
+            </div>
+            <h3 class="agent-title">Recommendation Agent</h3>
+            <p class="agent-desc">Converts analysis findings into actionable remediation plans. This agent generates specific, executable corrective actions for each discrepancy type — prioritized by business risk and sequenced for minimal operational disruption.</p>
+            <ul class="resp-list">
+              <li>Generate step-by-step remediation runbooks for each discrepancy type</li>
+              <li>Prioritize corrective actions by risk score × blast radius calculation</li>
+              <li>Draft ServiceNow change requests in ITIL-compliant format for CMDB updates</li>
+              <li>Generate compliance gap remediation plans mapped to specific control requirements</li>
+              <li>Estimate remediation effort, cost, and timeline for planning purposes</li>
+            </ul>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px">Priority Calculation</div>
+            <div class="formula-box">
+<span style="color:var(--yellow)">Priority Score =</span>
+  (Risk Severity × 0.4)
+  + (Compliance Impact × 0.3)
+  + (Asset Criticality × 0.2)
+  + (Remediation Ease × 0.1)
+
+<span style="color:var(--yellow)">P1 (≥80):</span>  Immediate Action Required
+<span style="color:var(--yellow)">P2 (60–79):</span> This Sprint
+<span style="color:var(--yellow)">P3 (40–59):</span> This Quarter
+<span style="color:var(--yellow)">P4 (&lt;40):</span>  Backlog
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">
+              <span class="tag tag-yellow">ITIL Aligned</span>
+              <span class="tag tag-yellow">Risk-Ranked</span>
+              <span class="tag tag-yellow">ServiceNow API</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agent 5 -->
+      <div class="agent-card a5 fade-up">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
+          <div>
+            <div class="agent-badge" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.25);color:#34d399">
+              <span>05</span> EXECUTIVE LAYER
+            </div>
+            <h3 class="agent-title">Executive Summary Agent</h3>
+            <p class="agent-desc">The final stage of the pipeline. This agent synthesizes the outputs of all previous agents into board-ready governance intelligence: scored metrics, visualized trends, and professionally formatted PDF executive reports suitable for CISOs, CIOs, and audit committees.</p>
+            <ul class="resp-list">
+              <li>Compute composite Governance Score from weighted inventory health, compliance, and trust metrics</li>
+              <li>Generate multi-page executive PDF with branded layouts using ReportLab</li>
+              <li>Produce trend analysis comparing current reconciliation against historical baselines</li>
+              <li>Create audit evidence packages with full data lineage and agent execution logs</li>
+              <li>Broadcast real-time governance metrics to Prometheus for Grafana dashboard alerting</li>
+            </ul>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px">Report Contents</div>
+            <div class="formula-box">
+<span style="color:var(--green)">EXECUTIVE REPORT SECTIONS:</span>
+  1. Governance Score Summary (KPIs)
+  2. Asset Health Overview (charts)
+  3. Critical Issues Requiring Action
+  4. Reconciliation Statistics
+  5. Compliance Framework Status
+  6. Trend Analysis (30/60/90 day)
+  7. Remediation Priority Matrix
+  8. Full Audit Trail &amp; Evidence
+  9. Agent Execution Metadata
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">
+              <span class="tag tag-green">ReportLab PDF</span>
+              <span class="tag tag-green">Governance KPIs</span>
+              <span class="tag tag-green">Audit Evidence</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- DATA FLOW -->
+  <section id="dataflow" class="section">
+    <div class="sec-eyebrow">Data Flow</div>
+    <h2 class="sec-title">End-to-End Data Flow</h2>
+    <p class="sec-desc">Every reconciliation cycle follows a deterministic ten-step pipeline. Steps 1–2 are user-triggered. Steps 3–10 execute autonomously via the agent orchestrator.</p>
+
+    <div class="flow-container fade-up" style="gap:4px;justify-content:flex-start;padding:20px 0">
+      <div class="flow-step">
+        <div class="flow-num">01</div>
+        <div class="flow-content">
+          <div class="flow-title">Upload CSV</div>
+          <div class="flow-sub">Infrastructure scan file from network discovery tool</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">02</div>
+        <div class="flow-content">
+          <div class="flow-title">Upload JSON</div>
+          <div class="flow-sub">ServiceNow CMDB export or cloud API payload</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">03</div>
+        <div class="flow-content">
+          <div class="flow-title">Inventory Processing</div>
+          <div class="flow-sub">Ingestion Agent normalizes, validates, deduplicates</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">04</div>
+        <div class="flow-content">
+          <div class="flow-title">Asset Reconciliation</div>
+          <div class="flow-sub">Reconciliation Agent runs multi-pass matching algorithm</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">05</div>
+        <div class="flow-content">
+          <div class="flow-title">AI Analysis</div>
+          <div class="flow-sub">Gemini 1.5 performs root cause and impact analysis</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">06</div>
+        <div class="flow-content">
+          <div class="flow-title">Recommendation Generation</div>
+          <div class="flow-sub">Prioritized remediation runbooks created per issue</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">07</div>
+        <div class="flow-content">
+          <div class="flow-title">Governance Scoring</div>
+          <div class="flow-sub">Composite scores computed across all dimensions</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">08</div>
+        <div class="flow-content">
+          <div class="flow-title">Executive Reporting</div>
+          <div class="flow-sub">Dashboard updated with new metrics and trends</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">09</div>
+        <div class="flow-content">
+          <div class="flow-title">PDF Generation</div>
+          <div class="flow-sub">ReportLab compiles board-ready audit package PDF</div>
+        </div>
+      </div>
+      <div class="flow-step" style="border:none">
+        <div class="flow-num">10</div>
+        <div class="flow-content">
+          <div class="flow-title">AI Chatbot</div>
+          <div class="flow-sub">Context-aware Q&A on reconciliation results available</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-grid-3" style="margin-top:32px">
+      <div class="glass-card" style="text-align:center">
+        <div style="font-family:'Syne',sans-serif;font-size:32px;font-weight:700;color:var(--accent)">~3min</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px">Full pipeline completion for 10,000 assets</div>
+      </div>
+      <div class="glass-card" style="text-align:center">
+        <div style="font-family:'Syne',sans-serif;font-size:32px;font-weight:700;color:var(--green)">Async</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px">Celery workers process stages in parallel where possible</div>
+      </div>
+      <div class="glass-card" style="text-align:center">
+        <div style="font-family:'Syne',sans-serif;font-size:32px;font-weight:700;color:var(--accent3)">Real-time</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px">WebSocket progress streaming to frontend during processing</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features" class="section">
+    <div class="sec-eyebrow">Core Features</div>
+    <h2 class="sec-title">Platform Capabilities</h2>
+    <p class="sec-desc">Eleven core capability domains, each backed by dedicated AI-powered services and a dedicated dashboard module.</p>
+
+    <div class="card-grid-3" style="margin-top:8px">
+      <div class="glass-card fade-up">
+        <div class="card-icon" style="background:rgba(59,130,246,0.12)">🔄</div>
+        <div class="card-title">Inventory Reconciliation</div>
+        <div class="card-desc">Continuous, automated reconciliation of live infrastructure against expected CMDB state. Supports estates of 100,000+ assets with sub-5-minute turnaround via Celery async workers.</div>
+      </div>
+      <div class="glass-card fade-up fade-up-d1">
+        <div class="card-icon" style="background:rgba(16,185,129,0.12)">🔭</div>
+        <div class="card-title">Asset Discovery</div>
+        <div class="card-desc">Surface every asset on your network including rogue devices, shadow IT, and unregistered cloud instances. Integrates with Nmap, Qualys, AWS Config, Azure Resource Graph, and GCP Asset Inventory.</div>
+      </div>
+      <div class="glass-card fade-up fade-up-d2">
+        <div class="card-icon" style="background:rgba(139,92,246,0.12)">🛡️</div>
+        <div class="card-title">Governance Monitoring</div>
+        <div class="card-desc">Real-time composite governance scoring across inventory health, compliance adherence, data trust, and operational risk. Scores update on every reconciliation cycle and are tracked historically.</div>
+      </div>
+      <div class="glass-card fade-up">
+        <div class="card-icon" style="background:rgba(6,182,212,0.12)">📋</div>
+        <div class="card-title">Compliance Tracking</div>
+        <div class="card-desc">Per-framework compliance status mapped to CIS Controls v8, NIST CSF, SOC 2 Type II, ISO 27001, GDPR Article 30, HIPAA §164.310, and PCI-DSS Requirement 9.</div>
+      </div>
+      <div class="glass-card fade-up fade-up-d1">
+        <div class="card-icon" style="background:rgba(245,158,11,0.12)">📄</div>
+        <div class="card-title">Executive Reporting</div>
+        <div class="card-desc">Board-ready PDF executive reports with trend charts, governance KPIs, and remediation priority matrices. Generated automatically after every reconciliation cycle via ReportLab.</div>
+      </div>
+      <div class="glass-card fade-up fade-up-d2">
+        <div class="card-icon" style="background:rgba(236,72,153,0.12)">🧠</div>
+        <div class="card-title">AI Analysis</div>
+        <div class="card-desc">Gemini 1.5 Flash–powered contextual analysis of every reconciliation discrepancy. Root cause identification, business impact quantification, and confidence-scored findings delivered for each issue.</div>
+      </div>
+      <div class="glass-card fade-up">
+        <div class="card-icon" style="background:rgba(239,68,68,0.12)">🔐</div>
+        <div class="card-title">Audit Readiness</div>
+        <div class="card-desc">Complete audit evidence packages with full data lineage, agent execution logs, digital signatures, and tamper-evident change history. Supports SOC 2 Type II evidence collection out of the box.</div>
+      </div>
+      <div class="glass-card fade-up fade-up-d1">
+        <div class="card-icon" style="background:rgba(99,102,241,0.12)">📈</div>
+        <div class="card-title">Predictive Drift Analysis</div>
+        <div class="card-desc">ML-powered drift velocity models that identify assets trending toward non-compliance before they fail. Uses historical reconciliation data to predict which assets will drift next and when.</div>
+      </div>
+      <div class="glass-card fade-up fade-up-d2">
+        <div class="card-icon" style="background:rgba(16,185,129,0.12)">💬</div>
+        <div class="card-title">AI Chatbot</div>
+        <div class="card-desc">Context-aware natural language interface for querying reconciliation results. Ask "Which servers have config drift in production?" or "What's our SOC 2 compliance gap?" and get instant, accurate answers.</div>
+      </div>
+      <div class="glass-card fade-up">
+        <div class="card-icon" style="background:rgba(59,130,246,0.12)">🔌</div>
+        <div class="card-title">ServiceNow Sync</div>
+        <div class="card-desc">Bidirectional integration with ServiceNow CMDB. Push AIMS reconciliation findings as change requests and incidents. Pull CMDB updates as the expected-state baseline. Full CMDB-as-Code workflow supported.</div>
+      </div>
+      <div class="glass-card fade-up fade-up-d1">
+        <div class="card-icon" style="background:rgba(6,182,212,0.12)">☁️</div>
+        <div class="card-title">Cloud Discovery</div>
+        <div class="card-desc">Native cloud asset discovery across AWS (EC2, RDS, Lambda), Azure (VMs, AKS, SQL), and GCP (Compute Engine, GKE, CloudSQL). All cloud resources normalized to canonical AssetRecord schema.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RECONCILIATION ENGINE -->
+  <section id="reconciliation" class="section">
+    <div class="sec-eyebrow">Reconciliation Engine</div>
+    <h2 class="sec-title">Six Reconciliation Outcomes</h2>
+    <p class="sec-desc">Every asset in a reconciliation cycle is classified into one of six outcome categories. Each category triggers a specific analysis path and remediation workflow.</p>
+
+    <div class="recon-types">
+      <div class="recon-card">
+        <div class="recon-type-badge" style="background:rgba(16,185,129,0.12);color:#34d399;border:1px solid rgba(16,185,129,0.2)">✓ EXACT MATCH</div>
+        <div class="recon-card-title">Exact Match</div>
+        <div class="recon-card-desc">Asset exists in both discovered inventory and CMDB. All attributes — hostname, IP, MAC, OS, hardware spec — match exactly. No action required. Asset contributes positively to governance score.</div>
+        <div class="recon-example">
+CMDB:  prod-web-01 | 10.0.1.10 | Ubuntu 22.04 | 16GB
+LIVE:  prod-web-01 | 10.0.1.10 | Ubuntu 22.04 | 16GB
+STATUS: ✓ HEALTHY
+        </div>
+      </div>
+
+      <div class="recon-card">
+        <div class="recon-type-badge" style="background:rgba(239,68,68,0.12);color:#f87171;border:1px solid rgba(239,68,68,0.2)">⚠ MISSING</div>
+        <div class="recon-card-title">Missing Asset</div>
+        <div class="recon-card-desc">Asset is registered in CMDB as expected but was not found during live discovery. Could indicate unauthorized decommission, hardware failure, network isolation, or VM termination without change management.</div>
+        <div class="recon-example">
+CMDB:  prod-db-backup | 10.0.5.22 | Windows Server 2019
+LIVE:  [NOT FOUND - 0 matching records]
+STATUS: ⚠ MISSING — P1 Incident Created
+        </div>
+      </div>
+
+      <div class="recon-card">
+        <div class="recon-type-badge" style="background:rgba(245,158,11,0.12);color:#fbbf24;border:1px solid rgba(245,158,11,0.2)">👁 UNTRACKED</div>
+        <div class="recon-card-title">Untracked Asset</div>
+        <div class="recon-card-desc">Asset discovered on live network but has no CMDB record. Classic shadow IT or rogue device scenario. Security risk: unpatched, unmanaged, potentially unauthorized. Requires immediate investigation.</div>
+        <div class="recon-example">
+CMDB:  [NO RECORD FOUND]
+LIVE:  unknown-vm-47 | 10.0.8.99 | CentOS 7 | 8GB
+STATUS: 👁 UNTRACKED — CMDB Entry Recommended
+        </div>
+      </div>
+
+      <div class="recon-card">
+        <div class="recon-type-badge" style="background:rgba(99,102,241,0.12);color:#a5b4fc;border:1px solid rgba(99,102,241,0.2)">~ NAMING DRIFT</div>
+        <div class="recon-card-title">Naming Mismatch</div>
+        <div class="recon-card-desc">Asset matched by IP/MAC but hostname deviates from CMDB record. Fuzzy matching identifies the relationship with a similarity score. Breaks monitoring tools and automation that rely on hostname-based discovery.</div>
+        <div class="recon-example">
+CMDB:  prod-app-server-01 | 10.0.2.15
+LIVE:  prd-appsvr-01     | 10.0.2.15
+MATCH: RapidFuzz similarity = 0.87 → NAMING DRIFT
+        </div>
+      </div>
+
+      <div class="recon-card">
+        <div class="recon-type-badge" style="background:rgba(6,182,212,0.12);color:#22d3ee;border:1px solid rgba(6,182,212,0.2)">⚙ CONFIG DRIFT</div>
+        <div class="recon-card-title">Configuration Drift</div>
+        <div class="recon-card-desc">Asset identity matches CMDB but one or more configuration attributes differ. Most common finding type. Could indicate unauthorized change, failed patch, or infrastructure scaling event that bypassed change management.</div>
+        <div class="recon-example">
+CMDB:  prod-db-01 | RAM: 32GB | OS: RHEL 8.4
+LIVE:  prod-db-01 | RAM: 64GB | OS: RHEL 8.7
+DRIFT: RAM +32GB, OS patch level +3 versions
+        </div>
+      </div>
+
+      <div class="recon-card">
+        <div class="recon-type-badge" style="background:rgba(236,72,153,0.12);color:#f472b6;border:1px solid rgba(236,72,153,0.2)">⊕ DUPLICATE</div>
+        <div class="recon-card-title">Duplicate Asset</div>
+        <div class="recon-card-desc">Multiple CMDB records or discovered instances resolve to the same physical/virtual asset. Indicates data quality failures in the CMDB. Creates inventory count inflation and misleads capacity planning.</div>
+        <div class="recon-example">
+CMDB:  prod-web-03 | 10.0.3.5 | ID: CI0001234
+CMDB:  production-web-3 | 10.0.3.5 | ID: CI0001891
+LIVE:  prod-web-03 | 10.0.3.5
+STATUS: ⊕ DUPLICATE CMDB ENTRIES — Merge Required
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GOVERNANCE ENGINE -->
+  <section id="governance" class="section">
+    <div class="sec-eyebrow">Governance Engine</div>
+    <h2 class="sec-title">Governance Scoring Model</h2>
+    <p class="sec-desc">AIMS computes five quantitative governance metrics that together form the composite Governance Score. Each metric is defined by a transparent, auditable formula.</p>
+
+    <div class="card-grid-2" style="margin-top:8px">
+      <div>
+        <div style="display:flex;flex-direction:column;gap:20px">
+
+          <div class="glass-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+              <div class="card-title" style="margin-bottom:0">📊 Inventory Health Score</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:var(--green)">98.2</div>
+            </div>
+            <div class="formula-box">
+IHS = (Exact Matches / Total Expected Assets) × 100
+    − (Missing Assets × 5)
+    − (Config Drifts × 2)
+    + (Successfully Remediated × 1)
+            </div>
+            <div class="card-desc" style="margin-top:8px">Measures the raw accuracy of the current inventory state against the CMDB expected baseline. The primary indicator of CMDB data quality.</div>
+          </div>
+
+          <div class="glass-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+              <div class="card-title" style="margin-bottom:0">📋 Compliance Score</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:var(--accent)">99.1</div>
+            </div>
+            <div class="formula-box">
+CS = Σ(framework_weights × framework_pass_rate)
+   where frameworks = [SOC2, ISO27001, CIS, NIST, PCI]
+   and  framework_weights sum to 1.0
+            </div>
+            <div class="card-desc" style="margin-top:8px">Weighted composite of compliance status across all enabled regulatory frameworks. Weight reflects business relevance (configurable per organization).</div>
+          </div>
+
+          <div class="glass-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+              <div class="card-title" style="margin-bottom:0">🏆 Governance Score</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;color:var(--accent3)">94.7</div>
+            </div>
+            <div class="formula-box">
+GS = (IHS × 0.30)
+   + (CS  × 0.30)
+   + (TS  × 0.20)
+   + (RS  × 0.20)
+
+where: IHS = Inventory Health Score
+       CS  = Compliance Score
+       TS  = Trust Score
+       RS  = 100 − Risk Score
+            </div>
+            <div class="card-desc" style="margin-top:8px">The single headline governance metric. A composite of all four sub-scores with configurable weights. Tracked historically to show governance improvement or degradation over time.</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="score-ring-container" style="flex-direction:column;gap:32px;margin-top:0">
+
+          <div style="width:100%">
+            <div style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px">Current Governance Posture</div>
+            <div class="score-row">
+              <div class="score-label">Inventory Health</div>
+              <div class="score-bar-track"><div class="score-bar-fill" style="width:98.2%;background:linear-gradient(90deg,var(--green),#34d399)"></div></div>
+              <div class="score-val">98.2</div>
+            </div>
+            <div class="score-row">
+              <div class="score-label">Compliance Score</div>
+              <div class="score-bar-track"><div class="score-bar-fill" style="width:99.1%;background:linear-gradient(90deg,var(--accent),#60a5fa)"></div></div>
+              <div class="score-val">99.1</div>
+            </div>
+            <div class="score-row">
+              <div class="score-label">Governance Score</div>
+              <div class="score-bar-track"><div class="score-bar-fill" style="width:94.7%;background:linear-gradient(90deg,var(--accent3),#c4b5fd)"></div></div>
+              <div class="score-val">94.7</div>
+            </div>
+            <div class="score-row">
+              <div class="score-label">Trust Score</div>
+              <div class="score-bar-track"><div class="score-bar-fill" style="width:91%;background:linear-gradient(90deg,var(--cyan),#22d3ee)"></div></div>
+              <div class="score-val">91.0</div>
+            </div>
+            <div class="score-row">
+              <div class="score-label">Risk Score (lower=better)</div>
+              <div class="score-bar-track"><div class="score-bar-fill" style="width:12%;background:linear-gradient(90deg,var(--red),#fca5a5)"></div></div>
+              <div class="score-val" style="color:var(--green)">12.0</div>
+            </div>
+          </div>
+
+          <div class="glass-card">
+            <div class="card-title">🔒 Trust Score</div>
+            <div class="formula-box" style="margin:12px 0">
+TS = (Data Quality × 0.40)
+   + (Source Confidence × 0.35)
+   + (Historical Accuracy × 0.25)
+            </div>
+            <div class="card-desc">Measures the reliability of the data sources feeding into AIMS. Low trust scores indicate unreliable discovery tools or stale CMDB data that should be refreshed before acting on reconciliation results.</div>
+          </div>
+
+          <div class="glass-card">
+            <div class="card-title">⚠️ Risk Score</div>
+            <div class="formula-box" style="margin:12px 0">
+RS = Σ(issue_severity × asset_criticality
+       × exposure_score × age_factor)
+   normalized to [0, 100]
+            </div>
+            <div class="card-desc">Quantifies the total risk exposure from all open reconciliation issues. Accounts for severity, affected asset criticality, network exposure, and time since detection. Lower is better; ≤20 is the target.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI WAR ROOM -->
+  <section id="warroom" class="section">
+    <div class="sec-eyebrow">AI Governance War Room</div>
+    <h2 class="sec-title">Agent Collaboration In Action</h2>
+    <p class="sec-desc">During each reconciliation cycle, agents communicate through a shared context pipeline. The following is a representative exchange during a reconciliation cycle that uncovered 47 discrepancies in a 12,000-asset enterprise environment.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 2fr;gap:24px;margin-top:8px">
+
+      <!-- Agent Status Panel -->
+      <div class="glass-card" style="height:fit-content">
+        <div style="font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px">Agent Status</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--surface);border-radius:8px">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)"></div>
+            <div style="flex:1">
+              <div style="font-size:12px;font-weight:600;color:var(--text)">Ingestion Agent</div>
+              <div style="font-size:10px;color:var(--green)">✓ Complete — 12,041 assets</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--surface);border-radius:8px">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)"></div>
+            <div style="flex:1">
+              <div style="font-size:12px;font-weight:600;color:var(--text)">Reconciliation Agent</div>
+              <div style="font-size:10px;color:var(--green)">✓ Complete — 47 issues found</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--surface);border-radius:8px">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)"></div>
+            <div style="flex:1">
+              <div style="font-size:12px;font-weight:600;color:var(--text)">Analysis Agent</div>
+              <div style="font-size:10px;color:var(--green)">✓ Complete — Gemini analyzed</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--surface);border-radius:8px">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)"></div>
+            <div style="flex:1">
+              <div style="font-size:12px;font-weight:600;color:var(--text)">Recommendation Agent</div>
+              <div style="font-size:10px;color:var(--green)">✓ Complete — 47 actions</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--surface);border-radius:8px">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)"></div>
+            <div style="flex:1">
+              <div style="font-size:12px;font-weight:600;color:var(--text)">Executive Agent</div>
+              <div style="font-size:10px;color:var(--green)">✓ PDF generated</div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:16px;padding:12px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);border-radius:8px">
+          <div style="font-size:11px;color:var(--green);font-weight:600;margin-bottom:4px">⏱ Pipeline Duration</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text)">2m 47s</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:4px">12,041 assets · 47 issues · 5 agents</div>
+        </div>
+      </div>
+
+      <!-- Chat Log -->
+      <div class="warroom-chat">
+        <div class="chat-msg">
+          <div class="chat-avatar" style="background:rgba(59,130,246,0.15);color:#60a5fa">IA</div>
+          <div class="chat-body">
+            <div class="chat-agent" style="color:#60a5fa">Ingestion Agent → Reconciliation Agent</div>
+            <div class="chat-text">Ingestion complete. Normalized 12,041 assets from 3 sources: CMDB export (11,803 records), network scan CSV (11,994 records), AWS Config JSON (247 records). Data quality score: 96.4. Passing normalized asset list downstream. 12 records rejected due to missing MAC address — flagged in metadata.</div>
+          </div>
+        </div>
+
+        <div class="chat-msg">
+          <div class="chat-avatar" style="background:rgba(99,102,241,0.15);color:#a5b4fc">RA</div>
+          <div class="chat-body">
+            <div class="chat-agent" style="color:#a5b4fc">Reconciliation Agent → Analysis Agent</div>
+            <div class="chat-text">Reconciliation complete. 3-pass matching algorithm executed.
+Results: 11,756 exact matches (97.6%), 8 missing assets (CMDB-expected, not discovered), 23 untracked assets (discovered, no CMDB record), 11 config drift (attribute mismatch), 5 naming drift (RapidFuzz 0.86–0.91 similarity), 3 duplicates.
+CRITICAL: 3 of 8 missing assets are production database servers (env=prod, tier=critical). Flagging for P1 treatment. Passing full issue manifest to Analysis Agent.</div>
+          </div>
+        </div>
+
+        <div class="chat-msg">
+          <div class="chat-avatar" style="background:rgba(139,92,246,0.15);color:#c4b5fd">AA</div>
+          <div class="chat-body">
+            <div class="chat-agent" style="color:#c4b5fd">Analysis Agent (Gemini 1.5) → Recommendation Agent</div>
+            <div class="chat-text">AI analysis complete. Gemini root cause assessment:
+• 3 missing prod DB servers: High confidence (0.92) unauthorized decommission or migration event. Last CMDB update 34 days ago. Business impact: CRITICAL — DR plan may reference offline assets.
+• 23 untracked assets: 19 probable shadow IT (dev team, based on naming), 4 unknown origin. Security risk: HIGH — 4 unknown devices on prod subnet.
+• 11 config drifts: Consistent with Jan 14 OS patching wave — CMDB not updated post-patch. LOW operational risk, HIGH compliance risk (SOC 2 CC7.2 violation).
+Governance assessment: SOC 2, ISO 27001 A.8.1.1, CIS Control 1.1 all affected. Passing enriched issues to Recommendation Agent.</div>
+          </div>
+        </div>
+
+        <div class="chat-msg">
+          <div class="chat-avatar" style="background:rgba(245,158,11,0.15);color:#fbbf24">RcA</div>
+          <div class="chat-body">
+            <div class="chat-agent" style="color:#fbbf24">Recommendation Agent → Executive Agent</div>
+            <div class="chat-text">Remediation plan generated. 47 actions created across 4 priority tiers:
+P1 (3): Immediate — Investigate and locate 3 missing production DB servers. Escalate to on-call DBA team. Create ServiceNow INC records.
+P2 (7): This sprint — Investigate 4 unknown devices on prod subnet. Security review required. Block at network layer pending investigation.
+P3 (14): This quarter — CMDB update campaign for 11 config drift assets post-patch validation. Assign to CMDB team.
+P4 (23): Backlog — Register shadow IT assets formally. Naming convention remediation.
+Total estimated remediation effort: 34 person-hours. Passing to Executive Agent for scoring and report generation.</div>
+          </div>
+        </div>
+
+        <div class="chat-msg">
+          <div class="chat-avatar" style="background:rgba(16,185,129,0.15);color:#34d399">EA</div>
+          <div class="chat-body">
+            <div class="chat-agent" style="color:#34d399">Executive Agent → Governance Dashboard</div>
+            <div class="chat-text">Executive summary compiled. Governance Score: 82.4 (↓ 4.1 from previous cycle — driven by 3 missing critical assets). Inventory Health: 97.6. Compliance Score: 89.2 (SOC 2 gap detected). Risk Score: 28 (ELEVATED — P1 issues open).
+PDF report generated: AIMS_Executive_Report_2024-01-15.pdf (18 pages, 2.4MB). Dashboard updated. Prometheus metrics pushed. Email alert queued for CISO distribution list. Cycle complete in 2m 47s.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TECH STACK -->
+  <section id="techstack" class="section">
+    <div class="sec-eyebrow">Technology Stack</div>
+    <h2 class="sec-title">Complete Technology Stack</h2>
+    <p class="sec-desc">Every technology choice in AIMS is deliberate. The stack optimizes for developer velocity, operational reliability, AI-first extensibility, and enterprise security compliance.</p>
+
+    <!-- Frontend -->
+    <div class="tech-category fade-up">
+      <div class="tech-cat-header">
+        <div class="tech-cat-icon" style="background:rgba(59,130,246,0.12)">🖥️</div>
+        <div>
+          <div class="tech-cat-name">Frontend</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px">Next.js · React · TypeScript · Tailwind CSS</div>
+        </div>
+      </div>
+      <div class="tech-items-grid">
+        <div class="tech-item"><div class="tech-item-name">Next.js 16</div><div class="tech-item-why">App Router with server components for hybrid SSR/CSR rendering. Optimal for data-intensive dashboard pages that need fast initial load with dynamic client updates.</div></div>
+        <div class="tech-item"><div class="tech-item-name">React 19</div><div class="tech-item-why">Component model and concurrent rendering for smooth, responsive UI under heavy data loads. React Server Actions eliminate boilerplate API calls for mutations.</div></div>
+        <div class="tech-item"><div class="tech-item-name">TypeScript</div><div class="tech-item-why">End-to-end type safety from API response to UI component. Critical for an enterprise platform where type mismatches in governance data can cause compliance miscalculations.</div></div>
+        <div class="tech-item"><div class="tech-item-name">Tailwind CSS</div><div class="tech-item-why">Utility-first styling enables consistent design token usage across 40+ dashboard components without stylesheet bloat. Dark mode theming via CSS variables.</div></div>
+        <div class="tech-item"><div class="tech-item-name">Zustand</div><div class="tech-item-why">Lightweight global state for reconciliation session context, agent status, and governance scores. Avoids Redux boilerplate for state that doesn't need server synchronization.</div></div>
+        <div class="tech-item"><div class="tech-item-name">React Query</div><div class="tech-item-why">Server state management with automatic background refetching for real-time governance metrics. Stale-while-revalidate patterns keep dashboards current without polling overhead.</div></div>
+        <div class="tech-item"><div class="tech-item-name">Recharts</div><div class="tech-item-why">Declarative SVG charts for governance trend visualization, reconciliation breakdowns, and compliance heat maps. Chosen for bundle efficiency over heavyweight alternatives.</div></div>
+        <div class="tech-item"><div class="tech-item-name">Lucide Icons</div><div class="tech-item-why">Consistent, tree-shakeable icon system. Enterprise-appropriate iconography that matches the governance and operations domain vocabulary.</div></div>
+      </div>
+    </div>
+
+    <!-- Backend -->
+    <div class="tech-category fade-up">
+      <div class="tech-cat-header">
+        <div class="tech-cat-icon" style="background:rgba(16,185,129,0.12)">⚙️</div>
+        <div>
+          <div class="tech-cat-name">Backend</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px">Python · FastAPI · SQLAlchemy · Pydantic</div>
+        </div>
+      </div>
+      <div class="tech-items-grid">
+        <div class="tech-item"><div class="tech-item-name">Python 3.12</div><div class="tech-item-why">First-class AI/ML ecosystem (Gemini SDK, LangChain, NumPy). Async support via asyncio. Mature data processing libraries for large inventory file parsing.</div></div>
+        <div class="tech-item"><div class="tech-item-name">FastAPI</div><div class="tech-item-why">Async-first REST framework with automatic OpenAPI spec generation. Dependency injection for clean service wiring. 3× faster than Django REST for high-throughput reconciliation endpoints.</div></div>
+        <div class="tech-item"><div class="tech-item-name">SQLAlchemy 2.0</div><div class="tech-item-why">Async ORM with strong typing support. Declarative models for asset, issue, and audit tables. Alembic migrations for zero-downtime schema evolution in production.</div></div>
+        <div class="tech-item"><div class="tech-item-name">Pydantic v2</div><div class="tech-item-why">Runtime data validation for all API contracts and asset normalization schemas. Rust-backed performance handles 10,000-asset validation passes in under 200ms.</div></div>
+        <div class="tech-item"><div class="tech-item-name">RapidFuzz</div><div class="tech-item-why">High-performance fuzzy string matching (C++ backend) for hostname similarity detection in the reconciliation engine. Processes 100,000 hostname comparisons in &lt;50ms.</div></div>
+        <div class="tech-item"><div class="tech-item-name">ReportLab</div><div class="tech-item-why">Python PDF generation library for executive reports. Supports branded layouts, embedded charts, tabular data, and digital signatures for audit evidence packages.</div></div>
+        <div class="tech-item"><div class="tech-item-name">PyTest</div><div class="tech-item-why">Test framework for unit and integration tests across all agent logic and API endpoints. Fixtures simulate reconciliation scenarios with pre-built test asset datasets.</div></div>
+      </div>
+    </div>
+
+    <!-- AI Layer -->
+    <div class="tech-category fade-up">
+      <div class="tech-cat-header">
+        <div class="tech-cat-icon" style="background:rgba(139,92,246,0.12)">🧠</div>
+        <div>
+          <div class="tech-cat-name">AI Layer</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px">Gemini 1.5 Flash · MCP · LangGraph-style Orchestrator</div>
+        </div>
+      </div>
+      <div class="tech-items-grid">
+        <div class="tech-item"><div class="tech-item-name">Gemini 1.5 Flash</div><div class="tech-item-why">Google's production-grade LLM for root cause analysis and business impact assessment. Flash variant chosen for low-latency responses on 47-issue batches (&lt;8s). 1M context window handles large reconciliation manifests.</div></div>
+        <div class="tech-item"><div class="tech-item-name">MCP (Model Context Protocol)</div><div class="tech-item-why">Anthropic's open protocol for structured tool use. Enables the Analysis Agent to call CMDB APIs, search the asset database, and invoke remediation services as structured tools during Gemini inference.</div></div>
+        <div class="tech-item"><div class="tech-item-name">LangGraph-style Orchestrator</div><div class="tech-item-why">Custom Python state machine that manages the agent pipeline as a directed acyclic graph. Handles agent-to-agent context passing, error recovery, parallel execution where possible, and audit logging of every state transition.</div></div>
+      </div>
+    </div>
+
+    <!-- Database -->
+    <div class="tech-category fade-up">
+      <div class="tech-cat-header">
+        <div class="tech-cat-icon" style="background:rgba(245,158,11,0.12)">🗄️</div>
+        <div>
+          <div class="tech-cat-name">Database</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px">PostgreSQL · Redis · SQLite</div>
+        </div>
+      </div>
+      <div class="tech-items-grid">
+        <div class="tech-item"><div class="tech-item-name">PostgreSQL 16</div><div class="tech-item-why">Primary data store for all assets, reconciliation results, and audit logs. JSONB columns for flexible asset attribute storage without schema migrations on new attribute types. Row-level security for RBAC enforcement at the database layer.</div></div>
+        <div class="tech-item"><div class="tech-item-name">Redis 7</div><div class="tech-item-why">Dual role: (1) Celery message broker for async agent task queues, (2) API response cache for governance scores and reconciliation summary reads. Pub/Sub for real-time WebSocket event broadcasting to the frontend.</div></div>
+        <div class="tech-item"><div class="tech-item-name">SQLite</div><div class="tech-item-why">Zero-config local database for development and testing environments. Alembic migrations are shared across SQLite and PostgreSQL backends, enabling full local development without Docker database containers.</div></div>
+      </div>
+    </div>
+
+    <!-- DevOps + Monitoring -->
+    <div class="card-grid-2" style="margin-top:20px">
+      <div class="tech-category" style="margin-bottom:0">
+        <div class="tech-cat-header">
+          <div class="tech-cat-icon" style="background:rgba(239,68,68,0.12)">🐳</div>
+          <div><div class="tech-cat-name">DevOps</div></div>
+        </div>
+        <div class="tech-items-grid" style="grid-template-columns:1fr 1fr">
+          <div class="tech-item"><div class="tech-item-name">Docker + Compose</div><div class="tech-item-why">Containerized microservices for backend, workers, Redis, and PostgreSQL. One-command local environment with docker compose up.</div></div>
+          <div class="tech-item"><div class="tech-item-name">GitHub Actions</div><div class="tech-item-why">CI/CD pipeline: lint → test → build → push. Automated PyTest suite on every PR. Container image push to GHCR on main branch merge.</div></div>
+          <div class="tech-item"><div class="tech-item-name">Kubernetes YAML</div><div class="tech-item-why">Production deployment manifests with HPA for auto-scaling Celery workers based on reconciliation queue depth. PodDisruptionBudgets for zero-downtime deployments.</div></div>
+          <div class="tech-item"><div class="tech-item-name">Celery + Redis</div><div class="tech-item-why">Async task queue for long-running reconciliation pipeline executions. Supports retries, result tracking, and parallel worker scaling.</div></div>
+        </div>
+      </div>
+      <div class="tech-category" style="margin-bottom:0">
+        <div class="tech-cat-header">
+          <div class="tech-cat-icon" style="background:rgba(6,182,212,0.12)">📡</div>
+          <div><div class="tech-cat-name">Observability</div></div>
+        </div>
+        <div class="tech-items-grid" style="grid-template-columns:1fr 1fr">
+          <div class="tech-item"><div class="tech-item-name">Prometheus</div><div class="tech-item-why">Custom metrics for reconciliation cycle duration, agent execution counts, governance score time-series, and API latency. Scraped from FastAPI /metrics endpoint.</div></div>
+          <div class="tech-item"><div class="tech-item-name">Grafana</div><div class="tech-item-why">Operations dashboards for Prometheus metrics. Pre-built AIMS dashboards for reconciliation performance, agent health, and governance score trends.</div></div>
+          <div class="tech-item"><div class="tech-item-name">Structured Logging</div><div class="tech-item-why">JSON log format with trace IDs threaded across all five agents. Enables distributed tracing of complete reconciliation cycles through the log stream.</div></div>
+          <div class="tech-item"><div class="tech-item-name">OpenTelemetry</div><div class="tech-item-why">Distributed tracing spans for each agent execution. Context propagation across async Celery task boundaries. OTLP export to any compatible backend.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DATABASE -->
+  <section id="database" class="section">
+    <div class="sec-eyebrow">Database Design</div>
+    <h2 class="sec-title">Entity-Relationship Schema</h2>
+    <p class="sec-desc">Seven core tables form the AIMS data model. All tables use UUIDs as primary keys and include created_at / updated_at audit timestamps. PostgreSQL row-level security enforces RBAC at the data layer.</p>
+
+    <div class="er-diagram fade-up">
+      <div class="er-layout">
+        <div class="er-table">
+          <div class="er-table-header">👤 users</div>
+          <div class="er-col pk"><span>id</span><span class="er-col-type">UUID PK</span></div>
+          <div class="er-col"><span>email</span><span class="er-col-type">VARCHAR</span></div>
+          <div class="er-col"><span>password_hash</span><span class="er-col-type">VARCHAR</span></div>
+          <div class="er-col"><span>role</span><span class="er-col-type">ENUM</span></div>
+          <div class="er-col"><span>full_name</span><span class="er-col-type">VARCHAR</span></div>
+          <div class="er-col"><span>is_active</span><span class="er-col-type">BOOLEAN</span></div>
+          <div class="er-col"><span>last_login</span><span class="er-col-type">TIMESTAMP</span></div>
+          <div class="er-col"><span>created_at</span><span class="er-col-type">TIMESTAMP</span></div>
+          <div class="er-col"><span>updated_at</span><span class="er-col-type">TIMESTAMP</span></div>
+        </div>
+
+        <div class="er-table">
+          <div class="er-table-header">💻 assets</div>
+          <div class="er-col pk"><span>id</span><span class="er-col-type">UUID PK</span></div>
+          <div class="er-col"><span>hostname</span><span class="er-col-type">VARCHAR</span></div>
+          <div class="er-col"><span>ip_address</span><span class="er-col-type">INET</span></div>
+          <div class="er-col"><span>mac_address</span><span class="er-col-type">MACADDR</span></div>
+          <div class="er-col"><span>os</span><span class="er-col-type">VARCHAR</span></div>
+          <div class="er-col"><span>ram_gb</span><span class="er-col-type">INTEGER</span></div>
+          <div class="er-col"><span>cpu_cores</span><span class="er-col-type">INTEGER</span></div>
+          <div class="er-col"><span>environment</span><span class="er-col-type">VARCHAR</span></div>
+          <div class="er-col"><span>owner</span><span class="er-col-type">VARCHAR</span></div>
+          <div class="er-col"><span>asset_type</span><span class="er-col-type">ENUM</span></div>
+          <div class="er-col"><span>cmdb_id</span><span class="er-col-type">VARCHAR</span></div>
+          <div class="er-col"><span>attributes</span><span class="er-col-type">JSONB</span></div>
+          <div class="er-col"><span>source</span><span class="er-col-type">ENUM</span></div>
+          <div class="er-col"><span>created_at</span><span class="er-col-type">TIMESTAMP</span></div>
+        </div>
+
+        <div class="er-table">
+          <div class="er-table-header">⚠️ issues</div>
+          <div class="er-col pk"><span>id</span><span class="er-col-type">UUID PK</span></div>
+          <div class="er-col fk"><span>asset_id</span><span class="er-col-type">UUID FK</span></div>
+          <div class="er-col fk"><span>reconciliation_id</span><span class="er-col-type">UUID FK</span></div>
+          <div class="er-col"><span>issue_type</span><span class="er-col-type">ENUM</span></div>
+          <div class="er-col"><span>severity</span><span class="er-col-type">ENUM</span></div>
+          <div class="er-col"><span>priority</span><span class="er-col-type">INTEGER</span></div>
+          <div class="er-col"><span>root_cause</span><span class="er-col-type">TEXT</span></div>
+          <div class="er-col"><span>business_impact</span><span class="er-col-type">TEXT</span></div>
+          <div class="er-col"><span>confidence</span><span class="er-col-type">FLOAT</span></div>
+          <div class="er-col"><span>status</span><span class="er-col-type">ENUM</span></div>
+          <div class="er-col"><span>created_at</span><span class="er-col-type">TIMESTAMP</span></div>
+        </div>
+
+        <div class="er-table">
+          <div class="er-table-header">🔄 reconciliation_results</div>
+          <div class="er-col pk"><span>id</span><span class="er-col-type">UUID PK</span></div>
+          <div class="er-col fk"><span>initiated_by</span><span class="er-col-type">UUID FK</span></div>
+          <div class="er-col"><span>status</span><span class="er-col-type">ENUM</span></div>
+          <div class="er-col"><span>total_assets</span><span class="er-col-type">INTEGER</span></div>
+          <div class="er-col"><span>exact_matches</span><span class="er-col-type">INTEGER</span></div>
+          <div class="er-col"><span>missing_count</span><span class="er-col-type">INTEGER</span></div>
+          <div class="er-col"><span>untracked_count</span><span class="er-col-type">INTEGER</span></div>
+          <div class="er-col"><span>config_drift_count</span><span class="er-col-type">INTEGER</span></div>
+          <div class="er-col"><span>governance_score</span><span class="er-col-type">FLOAT</span></div>
+          <div class="er-col"><span>health_score</span><span class="er-col-type">FLOAT</span></div>
+          <div class="er-col"><span>pdf_report_path</span><span class="er-col-type">VARCHAR</span></div>
+          <div class="er-col"><span>completed_at</span><span class="er-col-type">TIMESTAMP</span></div>
+        </div>
+
+        <div class="er-table">
+          <div class="er-table-header">📋 audit_logs</div>
+          <div class="er-col pk"><span>id</span><span class="er-col-type">UUID PK</span></div>
+          <div class="er-col fk"><span>user_id</span><span class="er-col-type">UUID FK</span></div>
+          <div class="er-col"><span>action</span><span class="er-col-type">VARCHAR</span></div>
+          <div class="er-col"><span>resource_type</span><span class="er-col-type">VARCHAR</span></div>
+          <div class="er-col"><span>resource_id</span><span class="er-col-type">UUID</span></div>
+          <div class="er-col"><span>changes</span><span class="er-col-type">JSONB</span></div>
+          <div class="er-col"><span>ip_address</span><span class="er-col-type">INET</span></div>
+          <div class="er-col"><span>user_agent</span><span class="er-col-type">VARCHAR</span></div>
+          <div class="er-col"><span>timestamp</span><span class="er-col-type">TIMESTAMP</span></div>
+        </div>
+
+        <div class="er-table">
+          <div class="er-table-header">🤖 agent_executions</div>
+          <div class="er-col pk"><span>id</span><span class="er-col-type">UUID PK</span></div>
+          <div class="er-col fk"><span>reconciliation_id</span><span class="er-col-type">UUID FK</span></div>
+          <div class="er-col"><span>agent_name</span><span class="er-col-type">VARCHAR</span></div>
+          <div class="er-col"><span>status</span><span class="er-col-type">ENUM</span></div>
+          <div class="er-col"><span>input_context</span><span class="er-col-type">JSONB</span></div>
+          <div class="er-col"><span>output_context</span><span class="er-col-type">JSONB</span></div>
+          <div class="er-col"><span>duration_ms</span><span class="er-col-type">INTEGER</span></div>
+          <div class="er-col"><span>gemini_tokens</span><span class="er-col-type">INTEGER</span></div>
+          <div class="er-col"><span>error_message</span><span class="er-col-type">TEXT</span></div>
+          <div class="er-col"><span>started_at</span><span class="er-col-type">TIMESTAMP</span></div>
+        </div>
+
+        <div class="er-table">
+          <div class="er-table-header">📊 system_metrics</div>
+          <div class="er-col pk"><span>id</span><span class="er-col-type">UUID PK</span></div>
+          <div class="er-col"><span>metric_name</span><span class="er-col-type">VARCHAR</span></div>
+          <div class="er-col"><span>metric_value</span><span class="er-col-type">FLOAT</span></div>
+          <div class="er-col"><span>dimensions</span><span class="er-col-type">JSONB</span></div>
+          <div class="er-col"><span>source</span><span class="er-col-type">VARCHAR</span></div>
+          <div class="er-col"><span>recorded_at</span><span class="er-col-type">TIMESTAMP</span></div>
+        </div>
+      </div>
+
+      <div style="margin-top:28px;padding-top:24px;border-top:1px solid var(--border)">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:12px;text-transform:uppercase;letter-spacing:1.5px">Relationships</div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text2);background:var(--surface);padding:6px 12px;border-radius:6px">users →(1:N)→ reconciliation_results</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text2);background:var(--surface);padding:6px 12px;border-radius:6px">reconciliation_results →(1:N)→ issues</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text2);background:var(--surface);padding:6px 12px;border-radius:6px">reconciliation_results →(1:N)→ agent_executions</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text2);background:var(--surface);padding:6px 12px;border-radius:6px">assets →(1:N)→ issues</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text2);background:var(--surface);padding:6px 12px;border-radius:6px">users →(1:N)→ audit_logs</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOLDER STRUCTURE -->
+  <section id="structure" class="section">
+    <div class="sec-eyebrow">Project Structure</div>
+    <h2 class="sec-title">Complete Folder Structure</h2>
+    <p class="sec-desc">Feature-first organization with clear separation of concerns. Every folder has a single, named responsibility that maps directly to a platform capability.</p>
+
+    <div class="card-grid-2">
+      <div class="tree-container fade-up">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:16px;text-transform:uppercase;letter-spacing:1.5px">Frontend (Next.js)</div>
+        <div class="tree-line"><span class="tree-dir">frontend/</span></div>
+        <div class="tree-indent">
+          <div class="tree-line"><span class="tree-dir">components/</span><span class="tree-comment">— Reusable UI building blocks</span></div>
+          <div class="tree-indent">
+            <div class="tree-line"><span class="tree-dir">dashboard/</span><span class="tree-comment">— KPI cards, score rings</span></div>
+            <div class="tree-line"><span class="tree-dir">agents/</span><span class="tree-comment">— Agent status displays</span></div>
+            <div class="tree-line"><span class="tree-dir">reconciliation/</span><span class="tree-comment">— Issue tables, diff views</span></div>
+            <div class="tree-line"><span class="tree-dir">charts/</span><span class="tree-comment">— Recharts wrappers</span></div>
+            <div class="tree-line"><span class="tree-dir">forms/</span><span class="tree-comment">— Upload, config forms</span></div>
+            <div class="tree-line"><span class="tree-dir">layout/</span><span class="tree-comment">— Sidebar, header, nav</span></div>
+          </div>
+          <div class="tree-line"><span class="tree-dir">pages/</span><span class="tree-comment">— Next.js App Router pages</span></div>
+          <div class="tree-indent">
+            <div class="tree-line"><span class="tree-file">dashboard/page.tsx</span></div>
+            <div class="tree-line"><span class="tree-file">reconciliation/page.tsx</span></div>
+            <div class="tree-line"><span class="tree-file">governance/page.tsx</span></div>
+            <div class="tree-line"><span class="tree-file">reports/page.tsx</span></div>
+            <div class="tree-line"><span class="tree-file">chatbot/page.tsx</span></div>
+          </div>
+          <div class="tree-line"><span class="tree-dir">hooks/</span><span class="tree-comment">— React Query hooks per domain</span></div>
+          <div class="tree-line"><span class="tree-dir">store/</span><span class="tree-comment">— Zustand state slices</span></div>
+          <div class="tree-line"><span class="tree-dir">services/</span><span class="tree-comment">— Axios API client wrappers</span></div>
+          <div class="tree-line"><span class="tree-dir">types/</span><span class="tree-comment">— Shared TypeScript interfaces</span></div>
+          <div class="tree-line"><span class="tree-dir">utils/</span><span class="tree-comment">— Score formatters, date utils</span></div>
+        </div>
+      </div>
+
+      <div class="tree-container fade-up fade-up-d1">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:16px;text-transform:uppercase;letter-spacing:1.5px">Backend (Python / FastAPI)</div>
+        <div class="tree-line"><span class="tree-dir">backend/</span></div>
+        <div class="tree-indent">
+          <div class="tree-line"><span class="tree-dir">agents/</span><span class="tree-comment">— One module per AI agent</span></div>
+          <div class="tree-indent">
+            <div class="tree-line"><span class="tree-file">ingestion_agent.py</span></div>
+            <div class="tree-line"><span class="tree-file">reconciliation_agent.py</span></div>
+            <div class="tree-line"><span class="tree-file">analysis_agent.py</span></div>
+            <div class="tree-line"><span class="tree-file">recommendation_agent.py</span></div>
+            <div class="tree-line"><span class="tree-file">executive_agent.py</span></div>
+            <div class="tree-line"><span class="tree-file">orchestrator.py</span><span class="tree-comment">— Pipeline manager</span></div>
+          </div>
+          <div class="tree-line"><span class="tree-dir">api/</span><span class="tree-comment">— FastAPI route handlers</span></div>
+          <div class="tree-indent">
+            <div class="tree-line"><span class="tree-dir">v1/</span><span class="tree-comment">— Versioned endpoints</span></div>
+            <div class="tree-indent">
+              <div class="tree-line"><span class="tree-file">assets.py</span></div>
+              <div class="tree-line"><span class="tree-file">reconciliation.py</span></div>
+              <div class="tree-line"><span class="tree-file">governance.py</span></div>
+              <div class="tree-line"><span class="tree-file">reports.py</span></div>
+              <div class="tree-line"><span class="tree-file">auth.py</span></div>
+              <div class="tree-line"><span class="tree-file">chatbot.py</span></div>
+            </div>
+          </div>
+          <div class="tree-line"><span class="tree-dir">services/</span><span class="tree-comment">— Business logic layer</span></div>
+          <div class="tree-line"><span class="tree-dir">models/</span><span class="tree-comment">— SQLAlchemy ORM models</span></div>
+          <div class="tree-line"><span class="tree-dir">database/</span><span class="tree-comment">— DB session, migrations</span></div>
+          <div class="tree-line"><span class="tree-dir">reports/</span><span class="tree-comment">— ReportLab PDF templates</span></div>
+          <div class="tree-line"><span class="tree-dir">tests/</span><span class="tree-comment">— PyTest suite</span></div>
+          <div class="tree-line"><span class="tree-dir">workers/</span><span class="tree-comment">— Celery task definitions</span></div>
+        </div>
+        <br>
+        <div class="tree-line"><span class="tree-dir">docker/</span><span class="tree-comment">— Dockerfiles per service</span></div>
+        <div class="tree-line"><span class="tree-dir">docs/</span><span class="tree-comment">— Architecture ADRs</span></div>
+        <div class="tree-line"><span class="tree-file">docker-compose.yml</span></div>
+        <div class="tree-line"><span class="tree-file">k8s/</span><span class="tree-comment">— Kubernetes manifests</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RBAC -->
+  <section id="rbac" class="section">
+    <div class="sec-eyebrow">Access Control</div>
+    <h2 class="sec-title">Role-Based Access Control</h2>
+    <p class="sec-desc">Four role tiers enforce the principle of least privilege across all AIMS capabilities. Roles are assigned per user in PostgreSQL and enforced at both the API layer (FastAPI dependency injection) and the database layer (row-level security).</p>
+
+    <table class="perm-table fade-up">
+      <thead>
+        <tr>
+          <th>Capability</th>
+          <th>👑 Admin</th>
+          <th>🧮 Controller</th>
+          <th>🔬 Analyst</th>
+          <th>👁 Viewer</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>User Management</strong> — Create, edit, delete users; assign roles</td><td><span class="perm-check">✓ Full</span></td><td><span class="perm-cross">✗</span></td><td><span class="perm-cross">✗</span></td><td><span class="perm-cross">✗</span></td></tr>
+        <tr><td><strong>System Configuration</strong> — CMDB connections, scoring weights, thresholds</td><td><span class="perm-check">✓ Full</span></td><td><span class="perm-cross">✗</span></td><td><span class="perm-cross">✗</span></td><td><span class="perm-cross">✗</span></td></tr>
+        <tr><td><strong>Run Reconciliation</strong> — Trigger full pipeline cycle</td><td><span class="perm-check">✓</span></td><td><span class="perm-partial">✓ Approve</span></td><td><span class="perm-check">✓</span></td><td><span class="perm-cross">✗</span></td></tr>
+        <tr><td><strong>Upload Inventory Files</strong> — CSV / JSON asset uploads</td><td><span class="perm-check">✓</span></td><td><span class="perm-partial">✓</span></td><td><span class="perm-check">✓</span></td><td><span class="perm-cross">✗</span></td></tr>
+        <tr><td><strong>View Reconciliation Results</strong> — Issues, diff reports</td><td><span class="perm-check">✓</span></td><td><span class="perm-check">✓</span></td><td><span class="perm-check">✓</span></td><td><span class="perm-check">✓ Read</span></td></tr>
+        <tr><td><strong>AI Analysis Results</strong> — Root cause, impact, confidence</td><td><span class="perm-check">✓</span></td><td><span class="perm-check">✓</span></td><td><span class="perm-check">✓</span></td><td><span class="perm-cross">✗</span></td></tr>
+        <tr><td><strong>Governance Dashboard</strong> — Scores, trends, KPIs</td><td><span class="perm-check">✓</span></td><td><span class="perm-check">✓</span></td><td><span class="perm-partial">✓ Read</span></td><td><span class="perm-check">✓ Read</span></td></tr>
+        <tr><td><strong>Executive Reports</strong> — Download PDF reports</td><td><span class="perm-check">✓</span></td><td><span class="perm-check">✓</span></td><td><span class="perm-partial">✓ Read</span></td><td><span class="perm-cross">✗</span></td></tr>
+        <tr><td><strong>Remediation Actions</strong> — Approve and execute recommendations</td><td><span class="perm-check">✓</span></td><td><span class="perm-check">✓</span></td><td><span class="perm-partial">✓ Propose</span></td><td><span class="perm-cross">✗</span></td></tr>
+        <tr><td><strong>AI Chatbot</strong> — Natural language queries</td><td><span class="perm-check">✓</span></td><td><span class="perm-check">✓</span></td><td><span class="perm-check">✓</span></td><td><span class="perm-partial">✓ Limited</span></td></tr>
+        <tr><td><strong>Audit Log Access</strong> — Full change history</td><td><span class="perm-check">✓ Full</span></td><td><span class="perm-check">✓ Read</span></td><td><span class="perm-cross">✗</span></td><td><span class="perm-cross">✗</span></td></tr>
+        <tr><td><strong>ServiceNow Integration</strong> — Push incidents and changes</td><td><span class="perm-check">✓</span></td><td><span class="perm-check">✓</span></td><td><span class="perm-partial">✓ View</span></td><td><span class="perm-cross">✗</span></td></tr>
+        <tr><td><strong>Agent Monitoring</strong> — View execution logs and performance</td><td><span class="perm-check">✓</span></td><td><span class="perm-partial">✓ View</span></td><td><span class="perm-partial">✓ View</span></td><td><span class="perm-cross">✗</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- AUTHENTICATION -->
+  <section id="auth" class="section">
+    <div class="sec-eyebrow">Authentication</div>
+    <h2 class="sec-title">Demo Credentials</h2>
+    <p class="sec-desc">Four pre-seeded accounts covering all RBAC role tiers. JWT tokens with 24-hour expiry. Refresh token rotation on every use. Passwords are bcrypt-hashed with cost factor 12.</p>
+
+    <div class="cred-grid fade-up">
+      <div class="cred-card">
+        <div class="cred-role" style="background:rgba(239,68,68,0.12);color:#f87171;border:1px solid rgba(239,68,68,0.2)">👑 Admin</div>
+        <div class="cred-email">admin@aims.com</div>
+        <div class="cred-password">••••••••••</div>
+        <div class="cred-note">Full platform access. Can manage users, configure integrations, and access all modules.</div>
+      </div>
+      <div class="cred-card">
+        <div class="cred-role" style="background:rgba(245,158,11,0.12);color:#fbbf24;border:1px solid rgba(245,158,11,0.2)">🧮 Controller</div>
+        <div class="cred-email">controller@aims.com</div>
+        <div class="cred-password">••••••••••</div>
+        <div class="cred-note">Asset review, governance monitoring, and executive reporting. Cannot manage users or system config.</div>
+      </div>
+      <div class="cred-card">
+        <div class="cred-role" style="background:rgba(59,130,246,0.12);color:#60a5fa;border:1px solid rgba(59,130,246,0.2)">🔬 Analyst</div>
+        <div class="cred-email">analyst@aims.com</div>
+        <div class="cred-password">••••••••••</div>
+        <div class="cred-note">Reconciliation, AI analysis, and chatbot access. Can upload files and propose remediation actions.</div>
+      </div>
+      <div class="cred-card">
+        <div class="cred-role" style="background:rgba(16,185,129,0.12);color:#34d399;border:1px solid rgba(16,185,129,0.2)">👁 Viewer</div>
+        <div class="cred-email">viewer@aims.com</div>
+        <div class="cred-password">••••••••••</div>
+        <div class="cred-note">Read-only access to dashboard and reconciliation results. Suitable for executive stakeholders.</div>
+      </div>
+    </div>
+
+    <div style="margin-top:24px;padding:16px 20px;background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.2);border-radius:10px;display:flex;gap:12px;align-items:start">
+      <div style="color:var(--accent);font-size:16px;flex-shrink:0">🔐</div>
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px">Security Implementation</div>
+        <div style="font-size:12px;color:var(--text3);line-height:1.7">JWT access tokens (15 min expiry) + refresh tokens (7 day, rotated on use) · bcrypt password hashing (cost=12) · CSRF protection via SameSite cookies · Rate limiting: 5 failed logins → 15-minute lockout · All auth events logged to audit_logs table with IP and user agent · Passwords shown as demo placeholders only — actual values are hashed on seed.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DASHBOARD MODULES -->
+  <section id="dashboard" class="section">
+    <div class="sec-eyebrow">Dashboard</div>
+    <h2 class="sec-title">Dashboard Modules</h2>
+    <p class="sec-desc">Twelve purpose-built modules, each a distinct view of a specific platform capability. All modules share the same React Query data layer and update in real time via WebSocket subscriptions.</p>
+
+    <div class="module-grid">
+      <div class="module-card">
+        <div class="module-icon">🏠</div>
+        <div class="module-name">Main Dashboard</div>
+        <div class="module-desc">Governance score ring, reconciliation history chart, open issue count by severity, and quick-action buttons for common workflows. Executive-first view.</div>
+      </div>
+      <div class="module-card">
+        <div class="module-icon">📋</div>
+        <div class="module-name">Expected Inventory</div>
+        <div class="module-desc">Full CMDB asset table with filtering, search, and per-asset health status. Inline editing of CMDB attributes with change log. Import from ServiceNow.</div>
+      </div>
+      <div class="module-card">
+        <div class="module-icon">🌐</div>
+        <div class="module-name">Live Infrastructure</div>
+        <div class="module-desc">Real-time view of discovered assets from the most recent scan. Network map visualization by subnet. Status indicators for each asset's reconciliation state.</div>
+      </div>
+      <div class="module-card">
+        <div class="module-icon">🔄</div>
+        <div class="module-name">Reconciliation Center</div>
+        <div class="module-desc">Trigger reconciliation cycles, monitor active pipeline progress via WebSocket, and review historical cycle results. Per-cycle statistics and trend charts.</div>
+      </div>
+      <div class="module-card">
+        <div class="module-icon">⚖️</div>
+        <div class="module-name">Comparison Matrix</div>
+        <div class="module-desc">Side-by-side attribute comparison for every asset pair with discrepancies. Highlighted diff view for config drift. One-click CMDB update generation.</div>
+      </div>
+      <div class="module-card">
+        <div class="module-icon">📊</div>
+        <div class="module-name">Executive Summary</div>
+        <div class="module-desc">Board-ready KPI dashboard with governance score trending, compliance heatmap, and top-10 priority issues. Suitable for CISO/CIO review meetings.</div>
+      </div>
+      <div class="module-card">
+        <div class="module-icon">📁</div>
+        <div class="module-name">Audit Reports</div>
+        <div class="module-desc">Repository of all generated PDF executive reports with metadata. Download, share, and archive audit evidence packages. Full data lineage per report.</div>
+      </div>
+      <div class="module-card">
+        <div class="module-icon">💬</div>
+        <div class="module-name">AI Chatbot</div>
+        <div class="module-desc">Gemini-powered natural language interface. Query reconciliation results, ask governance questions, and get remediation guidance in plain English. Context-aware across sessions.</div>
+      </div>
+      <div class="module-card">
+        <div class="module-icon">☁️</div>
+        <div class="module-name">Cloud Discovery</div>
+        <div class="module-desc">Connected cloud account inventory from AWS, Azure, and GCP. Real-time asset discovery, tagging status, and cloud-native configuration compliance checks.</div>
+      </div>
+      <div class="module-card">
+        <div class="module-icon">🔌</div>
+        <div class="module-name">ServiceNow Sync</div>
+        <div class="module-desc">Bidirectional CMDB integration status. View pending sync items, resolve conflicts, and push AIMS findings as ServiceNow incidents and change requests.</div>
+      </div>
+      <div class="module-card">
+        <div class="module-icon">🤖</div>
+        <div class="module-name">Agent Monitoring</div>
+        <div class="module-desc">Real-time status of all five AI agents. Execution history with Gemini token usage, duration, and output context. Alerting on agent failures or degraded performance.</div>
+      </div>
+      <div class="module-card">
+        <div class="module-icon">⚙️</div>
+        <div class="module-name">Admin Console</div>
+        <div class="module-desc">User management, RBAC configuration, integration credentials, scoring weight configuration, notification rules, and system health metrics. Admin role only.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BENEFITS -->
+  <section id="benefits" class="section">
+    <div class="sec-eyebrow">Business Value</div>
+    <h2 class="sec-title">Enterprise Benefits</h2>
+    <p class="sec-desc">AIMS delivers measurable ROI across four operational dimensions: risk reduction, compliance cost, operational efficiency, and governance quality.</p>
+
+    <div class="benefit-row">
+      <div class="benefit-card fade-up">
+        <div class="benefit-icon">🛡️</div>
+        <div>
+          <div class="benefit-title">Reduced Audit Risk</div>
+          <div class="benefit-desc">Continuous reconciliation eliminates the "audit scramble" — the frantic inventory verification that happens in the weeks before a SOC 2 or ISO 27001 audit. AIMS maintains audit-ready evidence at all times.</div>
+          <div class="benefit-stat">↓ 78% reduction in audit preparation time</div>
+        </div>
+      </div>
+      <div class="benefit-card fade-up fade-up-d1">
+        <div class="benefit-icon">📋</div>
+        <div>
+          <div class="benefit-title">Better Compliance</div>
+          <div class="benefit-desc">Real-time compliance scoring against five frameworks means gaps are detected and remediated continuously, not discovered during audits. Compliance status is always a known, measured quantity.</div>
+          <div class="benefit-stat">↑ 94%+ continuous compliance readiness</div>
+        </div>
+      </div>
+      <div class="benefit-card fade-up fade-up-d2">
+        <div class="benefit-icon">🎯</div>
+        <div>
+          <div class="benefit-title">CMDB Accuracy</div>
+          <div class="benefit-desc">AI-powered reconciliation keeps the CMDB synchronized with reality. Every discrepancy generates a specific correction recommendation, creating a continuous improvement loop for CMDB data quality.</div>
+          <div class="benefit-stat">↑ 98%+ CMDB accuracy target achievable</div>
+        </div>
+      </div>
+      <div class="benefit-card fade-up">
+        <div class="benefit-icon">👁️</div>
+        <div>
+          <div class="benefit-title">Operational Visibility</div>
+          <div class="benefit-desc">Every asset, everywhere, all the time. AIMS provides a single source of truth across on-premise, multi-cloud, and hybrid environments — eliminating the inventory visibility gap that creates operational surprises.</div>
+          <div class="benefit-stat">100% inventory coverage across all environments</div>
+        </div>
+      </div>
+      <div class="benefit-card fade-up fade-up-d1">
+        <div class="benefit-icon">🏆</div>
+        <div>
+          <div class="benefit-title">Governance Intelligence</div>
+          <div class="benefit-desc">Quantified governance scores replace subjective IT health assessments. Leadership gets a number they can track, trend, and benchmark — transforming governance from a qualitative judgment into a measurable KPI.</div>
+          <div class="benefit-stat">Single governance score for board-level reporting</div>
+        </div>
+      </div>
+      <div class="benefit-card fade-up fade-up-d2">
+        <div class="benefit-icon">⚡</div>
+        <div>
+          <div class="benefit-title">Faster Reconciliation</div>
+          <div class="benefit-desc">What previously required 3–5 analyst days of manual spreadsheet comparison now completes autonomously in under 5 minutes. For a 50,000-asset enterprise, that's 400 hours of analyst time saved per reconciliation cycle.</div>
+          <div class="benefit-stat">3 days → 3 minutes per reconciliation cycle</div>
+        </div>
+      </div>
+      <div class="benefit-card fade-up">
+        <div class="benefit-icon">🤖</div>
+        <div>
+          <div class="benefit-title">AI Automation</div>
+          <div class="benefit-desc">Root cause analysis, impact assessment, remediation planning, and executive reporting all execute autonomously. Human analysts focus on approvals and exception handling, not data processing and report writing.</div>
+          <div class="benefit-stat">↓ 85% reduction in manual reconciliation effort</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPARISON -->
+  <section id="comparison" class="section">
+    <div class="sec-eyebrow">Differentiation</div>
+    <h2 class="sec-title">Why AIMS is Different</h2>
+    <p class="sec-desc">Traditional reconciliation tools treat inventory comparison as a data problem. AIMS treats it as a governance intelligence problem — and applies AI to deliver outcomes that rule-based systems fundamentally cannot.</p>
+
+    <div class="compare-grid">
+      <div class="compare-col">
+        <div class="compare-header">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(239,68,68,0.1);display:flex;align-items:center;justify-content:center;font-size:14px">📊</div>
+          <div>
+            <div class="compare-header-text" style="color:var(--text2)">Traditional Tools</div>
+            <div style="font-size:11px;color:var(--text3)">ServiceNow Discovery, Tanium, SCCM</div>
+          </div>
+        </div>
+        <div class="compare-body">
+          <div class="compare-item"><span style="color:var(--red)">✗</span> Rule-based matching only — misses fuzzy naming patterns and contextual relationships</div>
+          <div class="compare-item"><span style="color:var(--red)">✗</span> No root cause analysis — tells you WHAT drifted, not WHY</div>
+          <div class="compare-item"><span style="color:var(--red)">✗</span> No business impact assessment — findings lack organizational context</div>
+          <div class="compare-item"><span style="color:var(--red)">✗</span> Periodic batch reconciliation only — no continuous governance monitoring</div>
+          <div class="compare-item"><span style="color:var(--red)">✗</span> No quantified governance scoring — health is subjective and unmeasured</div>
+          <div class="compare-item"><span style="color:var(--red)">✗</span> Reports require manual assembly by analysts — hours per cycle</div>
+          <div class="compare-item"><span style="color:var(--red)">✗</span> Single monolithic tool — no agent collaboration or parallel intelligence</div>
+          <div class="compare-item"><span style="color:var(--red)">✗</span> No predictive capability — reactive to failures, not proactive about risk</div>
+          <div class="compare-item"><span style="color:var(--red)">✗</span> No natural language interface — requires technical training to operate</div>
+        </div>
+      </div>
+
+      <div class="compare-col" style="border-color:rgba(59,130,246,0.25)">
+        <div class="compare-header" style="background:rgba(59,130,246,0.05);border-bottom-color:rgba(59,130,246,0.15)">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(59,130,246,0.15);display:flex;align-items:center;justify-content:center;font-size:14px">🧠</div>
+          <div>
+            <div class="compare-header-text" style="background:linear-gradient(135deg,#3b82f6,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent">AIMS</div>
+            <div style="font-size:11px;color:var(--text3)">AI-Powered Multi-Agent Governance</div>
+          </div>
+        </div>
+        <div class="compare-body">
+          <div class="compare-item" style="background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.15)"><span style="color:var(--green)">✓</span> Multi-pass fuzzy matching with RapidFuzz — catches naming drift conventional tools miss</div>
+          <div class="compare-item" style="background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.15)"><span style="color:var(--green)">✓</span> Gemini 1.5 root cause analysis — contextual intelligence on every finding</div>
+          <div class="compare-item" style="background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.15)"><span style="color:var(--green)">✓</span> Business impact quantification — findings prioritized by organizational risk</div>
+          <div class="compare-item" style="background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.15)"><span style="color:var(--green)">✓</span> Continuous governance monitoring with real-time score updates</div>
+          <div class="compare-item" style="background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.15)"><span style="color:var(--green)">✓</span> Transparent, formula-defined governance scoring — measurable and auditable</div>
+          <div class="compare-item" style="background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.15)"><span style="color:var(--green)">✓</span> Automated PDF executive reports generated at end of every cycle</div>
+          <div class="compare-item" style="background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.15)"><span style="color:var(--green)">✓</span> Five-agent collaboration — each agent a specialist, orchestrated into coherent output</div>
+          <div class="compare-item" style="background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.15)"><span style="color:var(--green)">✓</span> Predictive drift analysis using historical reconciliation patterns</div>
+          <div class="compare-item" style="background:rgba(16,185,129,0.05);border:1px solid rgba(16,185,129,0.15)"><span style="color:var(--green)">✓</span> AI chatbot for natural language querying — zero technical training required</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROADMAP -->
+  <section id="roadmap" class="section">
+    <div class="sec-eyebrow">Future Roadmap</div>
+    <h2 class="sec-title">Platform Evolution</h2>
+    <p class="sec-desc">AIMS is designed as a platform, not a product. Each phase builds on the last, progressively raising the level of AI autonomy from detection to full remediation.</p>
+
+    <div class="roadmap">
+      <div class="phase-card">
+        <div class="phase-num active">
+          <span class="phase-p">Phase</span>
+          <span class="phase-n">1</span>
+        </div>
+        <div class="phase-name">Inventory Reconciliation</div>
+        <div class="phase-desc">Core multi-agent reconciliation pipeline. CSV/JSON ingestion, six-outcome classification, Gemini analysis, PDF reporting.</div>
+        <div class="phase-items">
+          <div class="phase-item"><span style="color:var(--green)">✓</span> Ingestion Agent</div>
+          <div class="phase-item"><span style="color:var(--green)">✓</span> Reconciliation Agent</div>
+          <div class="phase-item"><span style="color:var(--green)">✓</span> AI Analysis Agent</div>
+          <div class="phase-item"><span style="color:var(--green)">✓</span> Executive Reports</div>
+        </div>
+        <div style="margin-top:14px"><span class="tag tag-green">Current</span></div>
+      </div>
+
+      <div class="phase-card">
+        <div class="phase-num">
+          <span class="phase-p">Phase</span>
+          <span class="phase-n">2</span>
+        </div>
+        <div class="phase-name">AI Governance</div>
+        <div class="phase-desc">Deep compliance framework mapping, ServiceNow bidirectional sync, cloud discovery integration, and governance war room collaboration view.</div>
+        <div class="phase-items">
+          <div class="phase-item"><span style="color:var(--accent)">→</span> SOC 2 / ISO 27001 Mapping</div>
+          <div class="phase-item"><span style="color:var(--accent)">→</span> ServiceNow Bidirectional</div>
+          <div class="phase-item"><span style="color:var(--accent)">→</span> Cloud Asset Discovery</div>
+          <div class="phase-item"><span style="color:var(--accent)">→</span> AI War Room UI</div>
+        </div>
+        <div style="margin-top:14px"><span class="tag tag-blue">In Progress</span></div>
+      </div>
+
+      <div class="phase-card">
+        <div class="phase-num">
+          <span class="phase-p">Phase</span>
+          <span class="phase-n">3</span>
+        </div>
+        <div class="phase-name">Predictive Governance</div>
+        <div class="phase-desc">ML drift velocity models that predict which assets will become non-compliant before they do. Proactive remediation scheduling and risk forecasting.</div>
+        <div class="phase-items">
+          <div class="phase-item"><span style="color:var(--text3)">○</span> Drift Velocity Modeling</div>
+          <div class="phase-item"><span style="color:var(--text3)">○</span> Risk Forecasting</div>
+          <div class="phase-item"><span style="color:var(--text3)">○</span> Proactive Alerting</div>
+          <div class="phase-item"><span style="color:var(--text3)">○</span> Anomaly Detection</div>
+        </div>
+        <div style="margin-top:14px"><span class="tag tag-purple">Planned Q3</span></div>
+      </div>
+
+      <div class="phase-card">
+        <div class="phase-num">
+          <span class="phase-p">Phase</span>
+          <span class="phase-n">4</span>
+        </div>
+        <div class="phase-name">Autonomous Remediation</div>
+        <div class="phase-desc">Fully autonomous corrective actions with human-in-the-loop approval gates. Auto-approve low-risk remediations; escalate high-risk changes to human controllers.</div>
+        <div class="phase-items">
+          <div class="phase-item"><span style="color:var(--text3)">○</span> Auto-Remediation Engine</div>
+          <div class="phase-item"><span style="color:var(--text3)">○</span> Approval Workflow</div>
+          <div class="phase-item"><span style="color:var(--text3)">○</span> CMDB Auto-Update</div>
+          <div class="phase-item"><span style="color:var(--text3)">○</span> Zero-Touch Governance</div>
+        </div>
+        <div style="margin-top:14px"><span class="tag tag-yellow">Planned Q1 2026</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUMMARY -->
+  <section id="summary" class="section" style="text-align:center;background:radial-gradient(ellipse 80% 60% at 50% 100%,rgba(59,130,246,0.06),transparent 60%)">
+    <div class="sec-eyebrow" style="display:inline-block">Project Summary</div>
+    <h2 class="sec-title" style="margin:12px auto 16px;max-width:700px">A New Standard for Enterprise<br>Asset Governance</h2>
+    <p style="font-size:15px;color:var(--text2);max-width:600px;margin:0 auto 40px;line-height:1.7">AIMS is not another CMDB tool. It is an AI-first governance platform that makes inventory reconciliation autonomous, intelligent, and continuously actionable.</p>
+
+    <div class="summary-features">
+      <div class="summary-feature">🔭 Asset Discovery</div>
+      <div class="summary-feature">🔄 CMDB Reconciliation</div>
+      <div class="summary-feature">🧠 AI Analysis</div>
+      <div class="summary-feature">🛡️ Governance Monitoring</div>
+      <div class="summary-feature">📄 Executive Reporting</div>
+      <div class="summary-feature">📋 Compliance Intelligence</div>
+      <div class="summary-feature">🤖 Multi-Agent Orchestration</div>
+      <div class="summary-feature">💬 AI Chatbot</div>
+      <div class="summary-feature">🔌 ServiceNow Integration</div>
+      <div class="summary-feature">☁️ Cloud Discovery</div>
+    </div>
+
+    <div class="card-grid-3" style="max-width:900px;margin:0 auto 40px;text-align:left">
+      <div class="glass-card" style="text-align:center">
+        <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:800;background:linear-gradient(135deg,#3b82f6,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent">5</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:4px">Specialized AI Agents</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px">Each owning a distinct governance domain</div>
+      </div>
+      <div class="glass-card" style="text-align:center">
+        <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:800;background:linear-gradient(135deg,#10b981,#3b82f6);-webkit-background-clip:text;-webkit-text-fill-color:transparent">6</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:4px">Reconciliation Outcomes</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px">Complete coverage of every asset state</div>
+      </div>
+      <div class="glass-card" style="text-align:center">
+        <div style="font-family:'Syne',sans-serif;font-size:36px;font-weight:800;background:linear-gradient(135deg,#f59e0b,#ef4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent">5</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:4px">Compliance Frameworks</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px">SOC 2, ISO 27001, CIS, NIST, PCI-DSS</div>
+      </div>
+    </div>
+
+    <div style="padding:28px;background:var(--surface);border:1px solid var(--border);border-radius:16px;max-width:700px;margin:0 auto;backdrop-filter:blur(10px)">
+      <div style="font-size:14px;color:var(--text2);line-height:1.8">
+        By combining <strong style="color:var(--text)">asset discovery</strong>, <strong style="color:var(--text)">CMDB reconciliation</strong>, <strong style="color:var(--text)">AI-powered analysis</strong>, <strong style="color:var(--text)">governance monitoring</strong>, <strong style="color:var(--text)">executive reporting</strong>, and <strong style="color:var(--text)">compliance intelligence</strong> into a single, unified platform orchestrated by five autonomous AI agents — AIMS transforms what was once a periodic, manual, analyst-intensive process into a continuous, autonomous, executive-ready governance operation.
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer id="footer">
+    <div class="footer-logo">AIMS</div>
+    <div class="footer-tagline">AI-Powered Enterprise Asset Governance Platform</div>
+    <div class="footer-built">Built using Multi-Agent AI Architecture · Gemini 1.5 · FastAPI · Next.js · PostgreSQL</div>
+    <div style="margin-top:20px;display:flex;justify-content:center;gap:16px;flex-wrap:wrap">
+      <span class="tag tag-blue">Multi-Agent AI</span>
+      <span class="tag tag-green">Gemini 1.5</span>
+      <span class="tag tag-purple">FastAPI</span>
+      <span class="tag tag-cyan">Next.js 16</span>
+      <span class="tag tag-yellow">PostgreSQL</span>
+      <span class="tag tag-red">Docker</span>
+    </div>
+    <div style="margin-top:24px;font-size:11px;color:var(--text3)">AIMS · Enterprise Asset Governance Intelligence · All reconciliation data shown is simulated for demonstration purposes.</div>
+  </footer>
+
+</main>
+
+<script>
+  // Active nav link on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-link');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(link => {
+          link.classList.remove('active');
+          if (link.getAttribute('href') === '#' + entry.target.id) {
+            link.classList.add('active');
+          }
+        });
+      }
+    });
+  }, { threshold: 0.2, rootMargin: '-80px 0px -60% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+
+  // Fade-up on scroll
+  const fadeEls = document.querySelectorAll('.fade-up');
+  const fadeObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  fadeEls.forEach(el => fadeObserver.observe(el));
+
+  // Close sidebar on mobile link click
+  navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      if (window.innerWidth <= 768) {
+        document.getElementById('sidebar').classList.remove('open');
+      }
+    });
+  });
+
+  // Animate score bars on enter
+  const scoreObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.querySelectorAll('.score-bar-fill').forEach(bar => {
+          const targetWidth = bar.style.width;
+          bar.style.width = '0%';
+          setTimeout(() => { bar.style.width = targetWidth; }, 100);
+        });
+      }
+    });
+  }, { threshold: 0.3 });
+
+  document.querySelectorAll('#governance').forEach(el => scoreObserver.observe(el));
+</script>
+</body>
+</html>
