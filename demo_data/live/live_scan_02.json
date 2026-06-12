@@ -1,0 +1,90 @@
+[
+  {
+    "asset_id": "srv-host-02-03",
+    "asset_name": "App Host 02 03",
+    "asset_type": "VM",
+    "location": "US-West-2",
+    "status": "Active",
+    "os": "Debian 12",
+    "environment": "Development",
+    "cpu": "6 Cores",
+    "memory": "12 GB"
+  },
+  {
+    "asset_id": "srv-host-02-06",
+    "asset_name": "App Host 02 06",
+    "asset_type": "Server",
+    "location": "AP-South-1",
+    "status": "Active",
+    "os": "Windows Server 2022",
+    "environment": "Development",
+    "cpu": "12 Cores",
+    "memory": "24 GB"
+  },
+  {
+    "asset_id": "srv-host-02-09",
+    "asset_name": "App Host 02 09 - Shadow IT",
+    "asset_type": "Server",
+    "location": "EU-West-1",
+    "status": "Active",
+    "os": "RHEL 9.2",
+    "environment": "Staging",
+    "cpu": "4 Cores",
+    "memory": "8 GB"
+  },
+  {
+    "asset_id": "srv-host-02-10",
+    "asset_name": "App Host 02 10 - Shadow IT",
+    "asset_type": "Server",
+    "location": "AP-South-1",
+    "status": "Active",
+    "os": "Windows Server 2022",
+    "environment": "Development",
+    "cpu": "4 Cores",
+    "memory": "8 GB"
+  },
+  {
+    "asset_id": "srv-host-02-02",
+    "asset_name": "App Host 02 02 (Updated)",
+    "asset_type": "Server",
+    "location": "AP-South-1",
+    "status": "Active",
+    "os": "Windows Server 2022",
+    "environment": "Development",
+    "cpu": "4 Cores",
+    "memory": "8 GB"
+  },
+  {
+    "asset_id": "srv-host-02-01",
+    "asset_name": "App Host 02 01 - Drifted Name",
+    "asset_type": "VM",
+    "location": "EU-West-1",
+    "status": "Active",
+    "os": "RHEL 9.2",
+    "environment": "Staging",
+    "cpu": "2 Cores",
+    "memory": "4 GB"
+  },
+  {
+    "asset_id": "srv-host-02-05",
+    "asset_name": "App Host 02 05",
+    "asset_type": "VM",
+    "location": "EU-West-1",
+    "status": "Active",
+    "os": "RHEL 9.2",
+    "environment": "Staging",
+    "cpu": "10 Cores",
+    "memory": "20 GB"
+  },
+  {
+    "asset_id": "srv-host-02-04",
+    "asset_name": "App Host 02 04",
+    "asset_type": "Server",
+    "location": "US-East-1",
+    "status": "Suspended",
+    "os": "Ubuntu 22.04 LTS",
+    "environment": "Production",
+    "cpu": "8 Cores",
+    "memory": "16 GB"
+  }
+]

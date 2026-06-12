@@ -1,0 +1,4 @@
+asset_id,asset_name,asset_type,environment
+srv-web-01,Web Server 01,Server,Production
+vm-db-02,Database VM 02,VM,Staging
+db-sql-03,SQL Server 03,Database,Production

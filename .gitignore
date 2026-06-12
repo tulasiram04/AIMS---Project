@@ -1,0 +1,39 @@
+# ─── Environment & Secrets ───────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ─── Python ──────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+venv/
+.venv/
+env/
+*.log
+.Python
+uploads/
+reports/
+
+# ─── Node / Frontend ─────────────────────────────────────
+node_modules/
+dist/
+*.local
+.DS_Store
+.cache/
+
+# ─── Docker ──────────────────────────────────────────────
+# (keep Dockerfiles, ignore volumes)
+
+# ─── IDE ─────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+Thumbs.db

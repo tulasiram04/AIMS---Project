@@ -1,0 +1,9 @@
+asset_id,asset_name,asset_type,location,status,os,environment,cpu,memory
+srv-host-08-05,App Host 08 05,VM,EU-West-1,Active,RHEL 9.2,Staging,10 Cores,20 GB
+srv-host-08-08,App Host 08 08 - Offline,VM,US-East-1,Active,Ubuntu 22.04 LTS,Production,2 Cores,4 GB
+srv-host-08-06,App Host 08 06,Server,AP-South-1,Active,Windows Server 2022,Development,12 Cores,24 GB
+srv-host-08-02,App Host 08 02,Server,AP-South-1,Active,Windows Server 2022,Development,4 Cores,8 GB
+srv-host-08-04,App Host 08 04,Server,US-East-1,Active,Ubuntu 22.04 LTS,Production,8 Cores,16 GB
+srv-host-08-07,App Host 08 07 - Offline,VM,US-West-2,Active,Debian 12,UAT,2 Cores,4 GB
+srv-host-08-03,App Host 08 03,VM,US-West-2,Active,Debian 12,UAT,6 Cores,12 GB
+srv-host-08-01,App Host 08 01,VM,EU-West-1,Active,RHEL 9.2,Staging,2 Cores,4 GB

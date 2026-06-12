@@ -1,0 +1,20 @@
+[
+  {
+    "asset_id": "srv-web-01",
+    "asset_name": "Web Server 01",
+    "asset_type": "Server",
+    "environment": "Production"
+  },
+  {
+    "asset_id": "vm-db-02",
+    "asset_name": "Database VM 02 Drifted",
+    "asset_type": "VM",
+    "environment": "Staging"
+  },
+  {
+    "asset_id": "net-switch-04",
+    "asset_name": "Core Switch 04",
+    "asset_type": "Network Device",
+    "environment": "Production"
+  }
+]
