@@ -1017,6 +1017,7 @@
     </div>
     <div class="nav-group">
       <div class="nav-group-label">Operations</div>
+      <a href="#dbadmin" class="nav-link"><span class="icon">🗄️</span>Database Admin</a>
       <a href="#troubleshoot" class="nav-link"><span class="icon">🔧</span>Troubleshooting</a>
       <a href="#deployment" class="nav-link"><span class="icon">🚢</span>Deployment</a>
       <a href="#status" class="nav-link"><span class="icon">📈</span>Project Status</a>
@@ -1731,6 +1732,62 @@ npm run dev</pre>
           <h3>Executive Command Center</h3>
           <p>Displays animated KPI counts, AI recommendation prioritizations, discrepancy classifications (Bar Charts),
             asset health distributions (Donut charts), and historical trends.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 14: DATABASE ADMIN PORTAL -->
+    <section class="section" id="dbadmin">
+      <h2>🗄️ Database Admin Portal</h2>
+      <p class="section-subtitle">Visualizing, querying, and maintaining the centralized PostgreSQL database</p>
+
+      <div class="alert alert-blue">
+        ⚙️ <strong>Pre-configured Management Console:</strong> AIMS runs an <strong>Adminer</strong> database manager container alongside the services. This exposes a web management UI on host port <code>8080</code> for direct database access.
+      </div>
+
+      <p style="font-size:14px;line-height:1.8;color:var(--text-2);margin-bottom:24px">
+        To maintain the tables, inspect users, review audit logs, or prune drift runs, open 
+        <a href="http://localhost:8080" target="_blank" style="color:var(--blue); font-weight:700">http://localhost:8080</a> 
+        in your browser and log in with the following default parameters:
+      </p>
+
+      <div class="cred-grid" style="margin-bottom: 24px">
+        <div class="cred-card">
+          <div class="role-icon">🗄️</div>
+          <h4>Connection Details</h4>
+          <div class="field"><label>System</label><span>PostgreSQL</span></div>
+          <div class="field"><label>Server</label><span>db</span></div>
+          <div class="field"><label>Username</label><span>postgres</span></div>
+          <div class="field"><label>Password</label><span>postgres</span></div>
+          <div class="field"><label>Database</label><span>inventory_db</span></div>
+        </div>
+      </div>
+
+      <div class="alert alert-yellow">
+        🌐 <strong>Centralizing in the Cloud:</strong> If you are deploying to a shared public domain and want all user interactions stored in a central repository:
+        <ol style="margin-left: 20px; margin-top: 8px; font-size: 13px; line-height: 1.6">
+          <li>Create a PostgreSQL database instance on a cloud provider like <strong>Supabase</strong> or <strong>Neon.tech</strong>.</li>
+          <li>Edit your <code>backend/.env</code> configuration file and set <code>DATABASE_URL</code> to your new remote cloud database string (e.g., <code>postgresql://user:pass@host.neon.tech/dbname?sslmode=require</code>).</li>
+          <li>Restart your docker compose services. The tables will automatically migrate on the cloud server.</li>
+          <li>To manage the remote DB, open your local Adminer on port <code>8080</code>, change the <strong>Server</strong> field to the remote host address (e.g., <code>host.neon.tech</code>), and enter your cloud credentials.</li>
+        </ol>
+      </div>
+
+      <h3 style="margin-top:24px; margin-bottom:12px; font-size:16px">📋 Database Operations Checklist</h3>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h4>Viewing Audit Logs & Active Users</h4>
+            <p>Select the <code>audit_logs</code> or <code>users</code> table in the left sidebar of Adminer, and click <strong>"Select data"</strong> to run a live query of user actions.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h4>Executing Database Truncations / Resets</h4>
+            <p>To wipe files and discrepancies from the backend without resetting audit trails, you can execute SQL commands or truncate the <code>inventory_uploads</code>, <code>assets</code>, <code>discrepancies</code>, and <code>reconciliations</code> tables via Adminer UI.</p>
+          </div>
         </div>
       </div>
     </section>

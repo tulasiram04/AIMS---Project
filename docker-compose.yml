@@ -57,6 +57,15 @@ services:
       backend:
         condition: service_healthy
 
+  adminer:
+    image: adminer:latest
+    container_name: inventory_adminer
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
 volumes:
   postgres_data:
   backend_uploads:
