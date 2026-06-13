@@ -1,7 +1,3 @@
-databases:
-  - name: aims-db
-    plan: free
-
 services:
   # 1. Backend Web Service
   - type: web
@@ -13,9 +9,7 @@ services:
     healthCheckPath: /health
     envVars:
       - key: DATABASE_URL
-        fromDatabase:
-          name: aims-db
-          property: connectionString
+        sync: false # Render will prompt you to enter your existing database connection string during setup
       - key: JWT_SECRET_KEY
         generateValue: true
       - key: JWT_ALGORITHM
