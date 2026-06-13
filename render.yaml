@@ -41,7 +41,7 @@ services:
           name: backend
           property: host
       - key: NGINX_ENVSUBST_FILTER
-        value: "BACKEND_HOST RESOLVER_IP"
+        value: "BACKEND_FQDN RESOLVER_IP"
 
   # 3. Admin Frontend Web Service
   - type: web
@@ -59,4 +59,4 @@ services:
           name: backend
           property: host
       - key: NGINX_ENVSUBST_FILTER
-        value: "BACKEND_HOST RESOLVER_IP"
+        value: "BACKEND_FQDN RESOLVER_IP"
