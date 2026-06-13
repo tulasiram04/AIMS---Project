@@ -1,7 +1,5 @@
 databases:
   - name: aims-db
-    databaseName: inventory_db
-    user: postgres
     plan: free
 
 services:
