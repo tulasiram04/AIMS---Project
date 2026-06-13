@@ -57,6 +57,17 @@ services:
       backend:
         condition: service_healthy
 
+  admin-frontend:
+    build:
+      context: ./admin-frontend
+      dockerfile: Dockerfile
+    container_name: inventory_admin_frontend
+    ports:
+      - "3001:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
   adminer:
     image: adminer:latest
     container_name: inventory_adminer

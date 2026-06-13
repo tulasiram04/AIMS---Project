@@ -1,3 +1,10 @@
+import bcrypt
+# Monkeypatch bcrypt to prevent passlib from failing to load it in Python 3.12+
+if not hasattr(bcrypt, "__about__"):
+    class About:
+        __version__ = bcrypt.__version__
+    bcrypt.__about__ = About()
+
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from passlib.context import CryptContext

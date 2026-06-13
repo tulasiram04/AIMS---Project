@@ -56,39 +56,39 @@ The system identifies four categories of discrepancies, scores governance postur
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                         USER BROWSER                           │
-│              React + TypeScript + Vite SPA                     │
-│              (Port 80 via Nginx reverse proxy)                 │
+│                         USER BROWSER                            │
+│              React + TypeScript + Vite SPA                      │
+│              (Port 80 via Nginx reverse proxy)                  │
 └──────────────────────────┬──────────────────────────────────────┘
                            │ HTTP/REST (proxied /api/v1)
                            ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                     NGINX REVERSE PROXY                         │
-│   /api/v1/* → backend:8000    /  → index.html (SPA fallback)   │
+│   /api/v1/* → backend:8000    /  → index.html (SPA fallback)    │
 └──────────────────────────┬──────────────────────────────────────┘
                            │
                            ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    FASTAPI BACKEND (Port 8000)                  │
-│                                                                 │
-│  ┌───────────┐  ┌───────────┐  ┌───────────┐  ┌───────────┐  │
-│  │ /auth     │  │ /users    │  │ /inventory│  │ /reports  │  │
-│  │ JWT login │  │ RBAC CRUD │  │ Upload,   │  │ Generate, │  │
-│  │ /me       │  │ Management│  │ Reconcile │  │ Download  │  │
-│  └───────────┘  └───────────┘  │ Chatbot   │  └───────────┘  │
+┌───────────────────────────────────────────────────────────────┐
+│                    FASTAPI BACKEND (Port 8000)                │
+│                                                               │
+│  ┌───────────┐  ┌───────────┐  ┌───────────┐  ┌───────────┐   │
+│  │ /auth     │  │ /users    │  │ /inventory│  │ /reports  │   │
+│  │ JWT login │  │ RBAC CRUD │  │ Upload,   │  │ Generate, │   │
+│  │ /me       │  │ Management│  │ Reconcile │  │ Download  │   │
+│  └───────────┘  └───────────┘  │ Chatbot   │  └───────────┘   │
 │                                └───────────┘                  │
 │  ┌─────────────────────────────────────────────────────────┐  │
 │  │           MULTI-AGENT AI PIPELINE (LangGraph)           │  │
-│  │  Discovery → Analysis → Severity → Recommendations →   │  │
+│  │  Discovery → Analysis → Severity → Recommendations →    │  │
 │  │  Executive Summary → Report Compilation                 │  │
 │  └─────────────────────────────────────────────────────────┘  │
-│                                                                 │
+│                                                               │
 │  ┌─────────────────────────────────────────────────────────┐  │
 │  │           REPORTLAB PDF ENGINE                          │  │
 │  │  9-section executive audit report (Times New Roman)     │  │
 │  │  Stored to Docker volume: backend_reports               │  │
 │  └─────────────────────────────────────────────────────────┘  │
-└──────────────────────────┬──────────────────────────────────────┘
+└──────────────────────────┬────────────────────────────────────┘
                            │ SQLAlchemy ORM
                            ▼
 ┌─────────────────────────────────────────────────────────────────┐

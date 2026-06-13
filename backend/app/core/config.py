@@ -13,8 +13,15 @@ class Settings(BaseSettings):
     BACKEND_HOST: str = "0.0.0.0"
     BACKEND_PORT: int = 8000
 
+    # Super Admin credentials
+    SUPER_ADMIN_USERNAME: str = "superadmin"
+    SUPER_ADMIN_PASSWORD: str = ""
+    SUPER_ADMIN_EMAIL: str = "superadmin@aims.internal"
+    SUPER_ADMIN_FULL_NAME: str = "Super Administrator"
+
     class Config:
         env_file = ".env"
         case_sensitive = True
+        extra = "ignore"
 
 settings = Settings()

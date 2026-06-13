@@ -5,6 +5,7 @@ from app.core.database import Base
 import enum
 
 class UserRole(str, enum.Enum):
+    SUPER_ADMIN = "Super Admin"
     ADMINISTRATOR = "Administrator"
     AUDITOR = "Auditor"
     ANALYST = "Analyst"

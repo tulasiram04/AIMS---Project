@@ -1,0 +1,56 @@
+databases:
+  - name: aims-db
+    databaseName: inventory_db
+    user: postgres
+    plan: free
+
+services:
+  # 1. Backend Web Service
+  - type: web
+    name: backend
+    env: docker
+    dockerfilePath: backend/Dockerfile
+    dockerContext: backend
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: aims-db
+          property: connectionString
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: JWT_ALGORITHM
+        value: HS256
+      - key: JWT_EXPIRATION_HOURS
+        value: "24"
+      - key: GEMINI_API_KEY
+        sync: false # User will input their Google Gemini API Key in the Render UI
+      - key: BACKEND_HOST
+        value: 0.0.0.0
+      - key: BACKEND_PORT
+        value: "8000"
+      - key: DEBUG
+        value: "false"
+
+  # 2. User Frontend Web Service
+  - type: web
+    name: frontend
+    env: docker
+    dockerfilePath: frontend/Dockerfile
+    dockerContext: frontend
+    plan: free
+    envVars:
+      - key: VITE_API_URL
+        value: /api/v1
+
+  # 3. Admin Frontend Web Service
+  - type: web
+    name: admin-frontend
+    env: docker
+    dockerfilePath: admin-frontend/Dockerfile
+    dockerContext: admin-frontend
+    plan: free
+    envVars:
+      - key: VITE_API_URL
+        value: /api/v1
