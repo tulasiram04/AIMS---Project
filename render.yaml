@@ -35,6 +35,13 @@ services:
     envVars:
       - key: VITE_API_URL
         value: /api/v1
+      - key: BACKEND_HOST
+        fromService:
+          type: web
+          name: backend
+          property: host
+      - key: NGINX_ENVSUBST_FILTER
+        value: BACKEND_HOST
 
   # 3. Admin Frontend Web Service
   - type: web
@@ -46,3 +53,10 @@ services:
     envVars:
       - key: VITE_API_URL
         value: /api/v1
+      - key: BACKEND_HOST
+        fromService:
+          type: web
+          name: backend
+          property: host
+      - key: NGINX_ENVSUBST_FILTER
+        value: BACKEND_HOST
