@@ -19,10 +19,6 @@ FROM nginx:alpine
 COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/templates/default.conf.template
 
-# Copy resolver set script and make it executable
-COPY 15-set-resolver.sh /docker-entrypoint.d/15-set-resolver.sh
-RUN chmod +x /docker-entrypoint.d/15-set-resolver.sh
-
 EXPOSE 80
 
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["/bin/sh", "-c", "export RESOLVER_IP=$(grep nameserver /etc/resolv.conf | head -n1 | awk '{print $2}') && envsubst '$BACKEND_HOST $RESOLVER_IP' < /etc/nginx/templates/default.conf.template > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"]
